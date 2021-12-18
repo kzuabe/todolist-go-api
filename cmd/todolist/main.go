@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/gin-gonic/gin"
 	"github.com/kzuabe/todolist-go-api/internal/entity"
+	"github.com/kzuabe/todolist-go-api/internal/router"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -17,7 +17,8 @@ func main() {
 	}
 	db.AutoMigrate(&entity.User{}, &entity.Task{})
 
-	router := gin.Default()
+	h := router.Handler{}
+	r := router.NewRouter(h)
 
-	router.Run("localhost:8080")
+	r.Run(":8080")
 }
