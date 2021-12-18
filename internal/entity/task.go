@@ -1,9 +1,7 @@
 package entity
 
-import "gorm.io/gorm"
-
 type Task struct {
-	gorm.Model
+	ID          uint
 	UserID      int
 	User        User
 	Title       string

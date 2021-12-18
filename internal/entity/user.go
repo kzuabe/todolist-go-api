@@ -1,8 +1,6 @@
 package entity
 
-import "gorm.io/gorm"
-
 type User struct {
-	gorm.Model
-	Name string
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
 }
