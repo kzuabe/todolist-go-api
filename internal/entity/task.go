@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Task struct {
 	gorm.Model
+	UserID      int
 	User        User
 	Title       string
 	Description string
