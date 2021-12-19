@@ -10,7 +10,8 @@ type UserRepository struct {
 }
 
 type UserRepositoryInterface interface {
-	FetchByID(uint) (entity.User, error)
+	FetchByID(int) (entity.User, error)
+	Create(entity.User) (entity.User, error)
 }
 
 type User struct {
@@ -18,6 +19,10 @@ type User struct {
 	Name string
 }
 
-func (repository *UserRepository) FetchByID(id uint) (entity.User, error) {
+func (repository *UserRepository) FetchByID(id int) (entity.User, error) {
+	return entity.User{ID: id}, nil
+}
+
+func (repository *UserRepository) Create(user entity.User) (entity.User, error) {
 	return entity.User{}, nil
 }

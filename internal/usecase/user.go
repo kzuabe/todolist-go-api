@@ -10,9 +10,14 @@ type UserUseCase struct {
 }
 
 type UserUseCaseInterface interface {
-	FetchByID(uint) (entity.User, error)
+	FetchByID(int) (entity.User, error)
+	Create(entity.User) (entity.User, error)
 }
 
-func (useCase *UserUseCase) FetchByID(id uint) (entity.User, error) {
+func (useCase *UserUseCase) FetchByID(id int) (entity.User, error) {
 	return useCase.Repository.FetchByID(id)
+}
+
+func (useCase *UserUseCase) Create(user entity.User) (entity.User, error) {
+	return useCase.Repository.Create(user)
 }

@@ -12,7 +12,11 @@ type Handler struct {
 func NewRouter(h Handler) *gin.Engine {
 	router := gin.Default()
 
-	router.GET("/", h.UserController.GetByID)
+	v1 := router.Group("/v1")
+	{
+		v1.GET("/users/:id", h.UserController.GetByID)
+		v1.POST("/users", h.UserController.Post)
+	}
 
 	return router
 }
