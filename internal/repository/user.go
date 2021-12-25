@@ -20,9 +20,28 @@ type User struct {
 }
 
 func (repository *UserRepository) FetchByID(id int) (entity.User, error) {
-	return entity.User{ID: id}, nil
+	u := User{}
+	result := repository.DB.First(&u, id)
+	return toEntityUser(u), result.Error
 }
 
 func (repository *UserRepository) Create(user entity.User) (entity.User, error) {
-	return entity.User{}, nil
+	u := toRepositoryUser(user)
+	result := repository.DB.Create(&u)
+	return toEntityUser(u), result.Error
+}
+
+func toEntityUser(user User) entity.User {
+	u := entity.User{
+		ID:   int(user.ID),
+		Name: user.Name,
+	}
+	return u
+}
+
+func toRepositoryUser(user entity.User) User {
+	u := User{
+		Name: user.Name,
+	}
+	return u
 }

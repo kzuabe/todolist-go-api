@@ -25,6 +25,6 @@ func (controller *UserController) GetByID(c *gin.Context) {
 }
 
 func (controller *UserController) Post(c *gin.Context) {
-	user, _ := controller.UseCase.Create(entity.User{})
+	user, _ := controller.UseCase.Create(entity.User{Name: "テストユーザ"})
 	c.IndentedJSON(http.StatusCreated, user)
 }
