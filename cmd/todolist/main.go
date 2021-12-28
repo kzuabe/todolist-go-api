@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
+	"log"
 	"os"
 
+	firebase "firebase.google.com/go"
 	"github.com/kzuabe/todolist-go-api/internal/controller"
 	"github.com/kzuabe/todolist-go-api/internal/repository"
 	"github.com/kzuabe/todolist-go-api/internal/router"
@@ -12,12 +15,19 @@ import (
 )
 
 func main() {
+
+	// DB セットアップ
 	dsn := os.Getenv("DSN") + "?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 	db.AutoMigrate(&repository.User{})
+
+	_, err = firebase.NewApp(context.Background(), nil)
+	if err != nil {
+		log.Fatalf("error initializing app: %v\n", err)
+	}
 
 	h := router.Handler{
 		UserController: &controller.UserController{
