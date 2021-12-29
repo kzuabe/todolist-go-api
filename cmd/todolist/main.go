@@ -10,6 +10,7 @@ import (
 	"github.com/kzuabe/todolist-go-api/internal/repository"
 	"github.com/kzuabe/todolist-go-api/internal/router"
 	"github.com/kzuabe/todolist-go-api/internal/usecase"
+	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -24,9 +25,14 @@ func main() {
 	}
 	db.AutoMigrate(&repository.User{})
 
-	_, err = firebase.NewApp(context.Background(), nil)
+	// Firebase Admin セットアップ
+	firebaseApp, err := firebase.NewApp(context.Background(), nil)
 	if err != nil {
 		log.Fatalf("error initializing app: %v\n", err)
+	}
+	firebaseAuthClient, err := firebaseApp.Auth(context.Background())
+	if err != nil {
+		log.Fatalf("error getting Auth client: %v\n", err)
 	}
 
 	h := router.Handler{
@@ -36,6 +42,9 @@ func main() {
 					DB: db,
 				},
 			},
+		},
+		FirebaseAuthMiddleware: &middleware.FirebaseAuthMiddleware{
+			Client: firebaseAuthClient,
 		},
 	}
 	r := router.NewRouter(h)
