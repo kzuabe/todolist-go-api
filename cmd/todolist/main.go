@@ -23,7 +23,7 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&repository.User{}, &repository.Task{})
+	db.AutoMigrate(&repository.Task{})
 
 	// Firebase Admin セットアップ
 	firebaseApp, err := firebase.NewApp(context.Background(), nil)
@@ -36,13 +36,6 @@ func main() {
 	}
 
 	h := router.Handler{
-		UserController: &controller.UserController{
-			UseCase: &usecase.UserUseCase{
-				Repository: &repository.UserRepository{
-					DB: db,
-				},
-			},
-		},
 		TaskController: &controller.TaskController{
 			UseCase: &usecase.TaskUseCase{
 				Repository: &repository.TaskRepository{
