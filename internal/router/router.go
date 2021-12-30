@@ -8,6 +8,7 @@ import (
 
 type Handler struct {
 	UserController         controller.UserControllerInterface
+	TaskController         controller.TaskControllerInterface
 	FirebaseAuthMiddleware middleware.FirebaseAuthMiddlewareInterface
 }
 
@@ -19,6 +20,7 @@ func NewRouter(h Handler) *gin.Engine {
 	{
 		v1.GET("/users/:id", h.UserController.GetByID)
 		v1.POST("/users", h.UserController.Post)
+		v1.GET("/tasks", h.TaskController.Get)
 	}
 
 	return router
