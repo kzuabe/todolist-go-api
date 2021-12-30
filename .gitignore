@@ -16,3 +16,4 @@
 
 .env
 service-account-file.json
+.vscode

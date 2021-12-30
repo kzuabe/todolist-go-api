@@ -3,6 +3,7 @@ module github.com/kzuabe/todolist-go-api
 go 1.17
 
 require (
+	firebase.google.com/go v3.13.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
 	gorm.io/driver/mysql v1.2.1
 	gorm.io/gorm v1.22.4
@@ -12,7 +13,6 @@ require (
 	cloud.google.com/go v0.99.0 // indirect
 	cloud.google.com/go/firestore v1.6.1 // indirect
 	cloud.google.com/go/storage v1.18.2 // indirect
-	firebase.google.com/go v3.13.0+incompatible // indirect
 	github.com/census-instrumentation/opencensus-proto v0.2.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403 // indirect
