@@ -25,7 +25,6 @@ func (useCase *TaskUseCase) Fetch(params entity.TaskFetchParam) ([]entity.Task, 
 func (useCase *TaskUseCase) Create(task entity.Task) (entity.Task, error) {
 	uuid := strings.ReplaceAll(uuid.NewString(), "-", "") // UUIDの生成（ハイフン除去済み）
 	task.ID = uuid
-	task.Status = 0 // ステータスの初期値を未着手にする
 	return useCase.Repository.Create(task)
 }
 
