@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kzuabe/todolist-go-api/internal/entity"
 	"github.com/kzuabe/todolist-go-api/internal/usecase"
+	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 )
 
 type TaskController struct {
@@ -19,16 +20,25 @@ type TaskControllerInterface interface {
 }
 
 func (controller *TaskController) Get(c *gin.Context) {
-	tasks, _ := controller.UseCase.Fetch()
+	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
+
+	params := entity.TaskFetchParam{}
+	if err := c.ShouldBindQuery(&params); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	params.UserID = token.UID
+
+	tasks, _ := controller.UseCase.Fetch(params)
 	c.IndentedJSON(http.StatusOK, tasks)
 }
 
 func (controller *TaskController) Post(c *gin.Context) {
-	token, _ := c.MustGet("token").(*auth.Token)
+	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
 	task := entity.Task{}
 	if err := c.ShouldBindJSON(&task); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	task.UserID = token.UID

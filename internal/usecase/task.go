@@ -13,12 +13,12 @@ type TaskUseCase struct {
 }
 
 type TaskUseCaseInterface interface {
-	Fetch() ([]entity.Task, error)
+	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
 	Create(entity.Task) (entity.Task, error)
 }
 
-func (useCase *TaskUseCase) Fetch() ([]entity.Task, error) {
-	return useCase.Repository.Fetch()
+func (useCase *TaskUseCase) Fetch(params entity.TaskFetchParam) ([]entity.Task, error) {
+	return useCase.Repository.Fetch(params)
 }
 
 func (useCase *TaskUseCase) Create(task entity.Task) (entity.Task, error) {

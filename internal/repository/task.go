@@ -10,7 +10,7 @@ type TaskRepository struct {
 }
 
 type TaskRepositoryInterface interface {
-	Fetch() ([]entity.Task, error)
+	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
 	Create(entity.Task) (entity.Task, error)
 }
 
@@ -23,8 +23,15 @@ type Task struct {
 	Status      int
 }
 
-func (repository *TaskRepository) Fetch() ([]entity.Task, error) {
-	return []entity.Task{}, nil
+func (repository *TaskRepository) Fetch(params entity.TaskFetchParam) ([]entity.Task, error) {
+	tx := repository.DB.Session(&gorm.Session{})
+	if status := params.Status; status != nil {
+		tx = tx.Where("status = ?", status)
+	}
+
+	tasks := []entity.Task{}
+	result := tx.Find(&tasks, "user_id = ?", params.UserID)
+	return tasks, result.Error
 }
 
 func (repository *TaskRepository) Create(task entity.Task) (entity.Task, error) {
