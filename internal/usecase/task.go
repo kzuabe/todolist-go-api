@@ -15,6 +15,7 @@ type TaskUseCase struct {
 type TaskUseCaseInterface interface {
 	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
 	Create(entity.Task) (entity.Task, error)
+	Update(entity.Task) (entity.Task, error)
 }
 
 func (useCase *TaskUseCase) Fetch(params entity.TaskFetchParam) ([]entity.Task, error) {
@@ -26,4 +27,8 @@ func (useCase *TaskUseCase) Create(task entity.Task) (entity.Task, error) {
 	task.ID = uuid
 	task.Status = 0 // ステータスの初期値を未着手にする
 	return useCase.Repository.Create(task)
+}
+
+func (useCase *TaskUseCase) Update(task entity.Task) (entity.Task, error) {
+	return useCase.Repository.Update(task)
 }

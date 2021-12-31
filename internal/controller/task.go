@@ -17,6 +17,7 @@ type TaskController struct {
 type TaskControllerInterface interface {
 	Get(c *gin.Context)
 	Post(c *gin.Context)
+	Put(c *gin.Context)
 }
 
 func (controller *TaskController) Get(c *gin.Context) {
@@ -46,4 +47,19 @@ func (controller *TaskController) Post(c *gin.Context) {
 	created, _ := controller.UseCase.Create(task)
 
 	c.IndentedJSON(http.StatusCreated, created)
+}
+
+func (controller *TaskController) Put(c *gin.Context) {
+	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
+
+	task := entity.Task{}
+	if err := c.ShouldBindJSON(&task); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	task.ID = c.Param("id")
+	task.UserID = token.UID
+
+	updated, _ := controller.UseCase.Update(task)
+	c.IndentedJSON(http.StatusCreated, updated)
 }

@@ -12,6 +12,7 @@ type TaskRepository struct {
 type TaskRepositoryInterface interface {
 	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
 	Create(entity.Task) (entity.Task, error)
+	Update(entity.Task) (entity.Task, error)
 }
 
 type Task struct {
@@ -44,6 +45,22 @@ func (repository *TaskRepository) Create(task entity.Task) (entity.Task, error) 
 	result := repository.DB.Create(&t)
 	created := toEntityTask(t)
 	return created, result.Error
+}
+
+func (repository *TaskRepository) Update(task entity.Task) (entity.Task, error) {
+	t := Task{}
+	_ = repository.DB.First(&t, "uuid = ?", task.ID) // TODO: エラーハンドリング
+	if t.UserID != task.UserID {
+		return entity.Task{}, nil
+	}
+
+	// 更新内容
+	t.Title = task.Title
+	t.Description = task.Description
+	t.Status = task.Status
+
+	result := repository.DB.Save(&t)
+	return toEntityTask(t), result.Error
 }
 
 func toDBTask(task entity.Task) Task {
