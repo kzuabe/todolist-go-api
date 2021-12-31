@@ -18,6 +18,7 @@ func NewRouter(h Handler) *gin.Engine {
 	v1 := router.Group("/v1")
 	{
 		v1.GET("/tasks", h.TaskController.Get)
+		v1.POST("/tasks", h.TaskController.Post)
 	}
 
 	return router

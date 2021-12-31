@@ -1,9 +1,9 @@
 package entity
 
 type Task struct {
-	ID          uint
-	UserID      string
-	Title       string
-	Description string
-	Status      string // todo: 未着手, wip: 進行中, done: 完了
+	ID          string `json:"id"` // UUID
+	UserID      string `json:"user_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Status      int    `json:"status"` // 0: 未着手, 1: 進行中, 2: 完了
 }
