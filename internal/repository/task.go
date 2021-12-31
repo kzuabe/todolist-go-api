@@ -29,8 +29,13 @@ func (repository *TaskRepository) Fetch(params entity.TaskFetchParam) ([]entity.
 		tx = tx.Where("status = ?", status)
 	}
 
-	tasks := []entity.Task{}
-	result := tx.Find(&tasks, "user_id = ?", params.UserID)
+	dbTasks := []Task{} // FIXME: RepositoryのTaskにする
+	result := tx.Find(&dbTasks, "user_id = ?", params.UserID)
+
+	tasks := make([]entity.Task, len(dbTasks))
+	for i, t := range dbTasks {
+		tasks[i] = toEntityTask(t)
+	}
 	return tasks, result.Error
 }
 
