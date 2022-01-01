@@ -5,6 +5,7 @@ go 1.17
 require (
 	firebase.google.com/go v3.13.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
+	github.com/google/uuid v1.3.0
 	gorm.io/driver/mysql v1.2.1
 	gorm.io/gorm v1.22.4
 )

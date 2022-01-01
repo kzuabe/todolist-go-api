@@ -1,9 +1,14 @@
 package entity
 
 type Task struct {
-	ID          uint
-	UserID      string
-	Title       string
-	Description string
-	Status      string // todo: 未着手, wip: 進行中, done: 完了
+	ID          string `json:"id"` // UUID
+	UserID      string `json:"-"`  // NOTE: 自明のためリクエスト・レスポンスボディに含めない
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Status      int    `json:"status"` // 0: 未着手, 1: 完了
+}
+
+type TaskFetchParam struct {
+	UserID string `form:"-"`
+	Status *int   `form:"status"`
 }

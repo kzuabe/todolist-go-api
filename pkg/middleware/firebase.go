@@ -9,6 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const CONTEXT_TOKEN_KEY = "token"
+
 type FirebaseAuthMiddleware struct {
 	Client *auth.Client
 }
@@ -32,7 +34,7 @@ func (middleware *FirebaseAuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		c.Set("token", token)
+		c.Set(CONTEXT_TOKEN_KEY, token)
 		c.Next()
 	}
 }

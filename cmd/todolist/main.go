@@ -6,6 +6,7 @@ import (
 	"os"
 
 	firebase "firebase.google.com/go"
+	"github.com/gin-gonic/gin"
 	"github.com/kzuabe/todolist-go-api/internal/controller"
 	"github.com/kzuabe/todolist-go-api/internal/repository"
 	"github.com/kzuabe/todolist-go-api/internal/router"
@@ -13,13 +14,23 @@ import (
 	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
+var gormLogMode = logger.Info
+
 func main() {
+	// 環境ごとのセットアップ
+	if os.Getenv("API_ENV") == "production" {
+		gin.SetMode(gin.ReleaseMode)
+		gormLogMode = logger.Error
+	}
 
 	// DB セットアップ
 	dsn := os.Getenv("DSN") + "?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(gormLogMode),
+	})
 	if err != nil {
 		panic("failed to connect database")
 	}
