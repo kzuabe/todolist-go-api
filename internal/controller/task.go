@@ -16,6 +16,7 @@ type TaskController struct {
 
 type TaskControllerInterface interface {
 	Get(c *gin.Context)
+	GetByID(c *gin.Context)
 	Post(c *gin.Context)
 	Put(c *gin.Context)
 	Delete(c *gin.Context)
@@ -33,6 +34,13 @@ func (controller *TaskController) Get(c *gin.Context) {
 
 	tasks, _ := controller.UseCase.Fetch(params)
 	c.IndentedJSON(http.StatusOK, tasks)
+}
+
+func (controller *TaskController) GetByID(c *gin.Context) {
+	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
+	id := c.Param("id")
+	task, _ := controller.UseCase.FetchByID(id, token.UID)
+	c.IndentedJSON(http.StatusOK, task)
 }
 
 func (controller *TaskController) Post(c *gin.Context) {
