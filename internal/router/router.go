@@ -20,6 +20,7 @@ func NewRouter(h Handler) *gin.Engine {
 		v1.GET("/tasks", h.TaskController.Get)
 		v1.POST("/tasks", h.TaskController.Post)
 		v1.PUT("/tasks/:id", h.TaskController.Put)
+		v1.DELETE("/tasks/:id", h.TaskController.Delete)
 	}
 
 	return router

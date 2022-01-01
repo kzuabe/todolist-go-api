@@ -13,6 +13,7 @@ type TaskRepositoryInterface interface {
 	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
 	Create(entity.Task) (entity.Task, error)
 	Update(entity.Task) (entity.Task, error)
+	Delete(string, string) error
 }
 
 type Task struct {
@@ -61,6 +62,11 @@ func (repository *TaskRepository) Update(task entity.Task) (entity.Task, error) 
 
 	result := repository.DB.Save(&t)
 	return toEntityTask(t), result.Error
+}
+
+func (repository *TaskRepository) Delete(id string, userID string) error {
+	result := repository.DB.Delete(&Task{}, "uuid = ? AND user_id = ?", id, userID)
+	return result.Error
 }
 
 func toDBTask(task entity.Task) Task {

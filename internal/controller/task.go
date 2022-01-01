@@ -18,6 +18,7 @@ type TaskControllerInterface interface {
 	Get(c *gin.Context)
 	Post(c *gin.Context)
 	Put(c *gin.Context)
+	Delete(c *gin.Context)
 }
 
 func (controller *TaskController) Get(c *gin.Context) {
@@ -62,4 +63,14 @@ func (controller *TaskController) Put(c *gin.Context) {
 
 	updated, _ := controller.UseCase.Update(task)
 	c.IndentedJSON(http.StatusCreated, updated)
+}
+
+func (controller *TaskController) Delete(c *gin.Context) {
+	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
+
+	id := c.Param("id")
+	userID := token.UID
+
+	_ = controller.UseCase.Delete(id, userID)
+	c.Status(http.StatusNoContent)
 }

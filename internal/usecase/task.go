@@ -16,6 +16,7 @@ type TaskUseCaseInterface interface {
 	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
 	Create(entity.Task) (entity.Task, error)
 	Update(entity.Task) (entity.Task, error)
+	Delete(string, string) error
 }
 
 func (useCase *TaskUseCase) Fetch(params entity.TaskFetchParam) ([]entity.Task, error) {
@@ -30,4 +31,8 @@ func (useCase *TaskUseCase) Create(task entity.Task) (entity.Task, error) {
 
 func (useCase *TaskUseCase) Update(task entity.Task) (entity.Task, error) {
 	return useCase.Repository.Update(task)
+}
+
+func (useCase *TaskUseCase) Delete(id string, userID string) error {
+	return useCase.Repository.Delete(id, userID)
 }
