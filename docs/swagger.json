@@ -1,0 +1,62 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "TODOリストアプリのRESTfulAPI（Go実装）",
+        "title": "TodoList API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "paths": {
+        "/v1/tasks/{id}": {
+            "get": {
+                "description": "ユーザのタスクを1件取得する",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "task"
+                ],
+                "summary": "タスク取得（1件）",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "タスクID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Task"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entity.Task": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "UUID",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "0: 未着手, 1: 完了",
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "x-order": 1
+}

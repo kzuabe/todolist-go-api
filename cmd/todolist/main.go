@@ -19,6 +19,10 @@ import (
 
 var gormLogMode = logger.Info
 
+// @title TodoList API
+// @version 1.0
+// @description TODOリストアプリのRESTfulAPI（Go実装）
+// @x-order 1
 func main() {
 	// 環境ごとのセットアップ
 	if os.Getenv("API_ENV") == "production" {
