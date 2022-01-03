@@ -1,0 +1,138 @@
+definitions:
+  entity.Task:
+    properties:
+      description:
+        type: string
+      id:
+        description: UUID
+        type: string
+      status:
+        description: '0: 未着手, 1: 完了'
+        type: integer
+      title:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: TODOリストアプリのRESTfulAPI（Go実装）
+  title: TodoList API
+  version: "1.0"
+paths:
+  /v1/tasks:
+    get:
+      description: ユーザのタスクを複数件取得する
+      parameters:
+      - description: 'タスクステータス 0: 未着手 1: 完了'
+        enum:
+        - 0
+        - 1
+        in: query
+        name: status
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Task'
+            type: array
+      security:
+      - TokenAuth: []
+      summary: タスク取得
+      tags:
+      - task
+    post:
+      consumes:
+      - application/json
+      description: ユーザのタスクを追加する
+      parameters:
+      - description: Payload Description
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Task'
+      security:
+      - TokenAuth: []
+      summary: タスク追加
+      tags:
+      - task
+  /v1/tasks/{id}:
+    delete:
+      description: ユーザのタスクを削除する
+      parameters:
+      - description: タスクID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Task'
+      security:
+      - TokenAuth: []
+      summary: タスク削除
+      tags:
+      - task
+    get:
+      description: ユーザのタスクを1件取得する
+      parameters:
+      - description: タスクID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Task'
+      security:
+      - TokenAuth: []
+      summary: タスク取得（1件）
+      tags:
+      - task
+    put:
+      consumes:
+      - application/json
+      description: ユーザのタスクを更新する
+      parameters:
+      - description: Payload Description
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Task'
+      security:
+      - TokenAuth: []
+      summary: タスク更新
+      tags:
+      - task
+securityDefinitions:
+  TokenAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
