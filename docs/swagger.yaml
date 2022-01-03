@@ -34,8 +34,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/entity.Task'
+      security:
+      - TokenAuth: []
       summary: タスク取得（1件）
       tags:
       - task
+securityDefinitions:
+  TokenAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
-x-order: 1

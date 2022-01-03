@@ -37,13 +37,14 @@ func (controller *TaskController) Get(c *gin.Context) {
 }
 
 // GetByID godoc
-// @Summary タスク取得（1件）
-// @Description ユーザのタスクを1件取得する
-// @Tags task
-// @Produce json
-// @Param id path string true "タスクID"
-// @Success 200 {object} entity.Task
-// @Router /v1/tasks/{id} [get]
+// @Summary      タスク取得（1件）
+// @Description  ユーザのタスクを1件取得する
+// @Tags         task
+// @Produce      json
+// @Param        id  path  string  true  "タスクID"
+// @Security     TokenAuth
+// @Success      200  {object}  entity.Task
+// @Router       /v1/tasks/{id} [get]
 func (controller *TaskController) GetByID(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 	id := c.Param("id")

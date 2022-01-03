@@ -25,6 +25,11 @@ var doc = `{
     "paths": {
         "/v1/tasks/{id}": {
             "get": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
                 "description": "ユーザのタスクを1件取得する",
                 "produces": [
                     "application/json"
@@ -74,7 +79,13 @@ var doc = `{
             }
         }
     },
-    "x-order": 1
+    "securityDefinitions": {
+        "TokenAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
 }`
 
 type swaggerInfo struct {
