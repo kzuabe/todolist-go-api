@@ -23,6 +23,83 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/tasks": {
+            "get": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "description": "ユーザのタスクを複数件取得する",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "task"
+                ],
+                "summary": "タスク取得",
+                "parameters": [
+                    {
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "type": "integer",
+                        "description": "タスクステータス 0: 未着手 1: 完了",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Task"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "description": "ユーザのタスクを追加する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "task"
+                ],
+                "summary": "タスク追加",
+                "parameters": [
+                    {
+                        "description": "Payload Description",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Task"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Task"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/tasks/{id}": {
             "get": {
                 "security": [
@@ -38,6 +115,75 @@ var doc = `{
                     "task"
                 ],
                 "summary": "タスク取得（1件）",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "タスクID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Task"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "description": "ユーザのタスクを更新する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "task"
+                ],
+                "summary": "タスク更新",
+                "parameters": [
+                    {
+                        "description": "Payload Description",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Task"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Task"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "description": "ユーザのタスクを削除する",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "task"
+                ],
+                "summary": "タスク削除",
                 "parameters": [
                     {
                         "type": "string",

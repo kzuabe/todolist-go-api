@@ -22,6 +22,15 @@ type TaskControllerInterface interface {
 	Delete(c *gin.Context)
 }
 
+// Get godoc
+// @Summary      タスク取得
+// @Description  ユーザのタスクを複数件取得する
+// @Tags         task
+// @Produce      json
+// @Param        status  query     int  false  "タスクステータス 0: 未着手 1: 完了"  Enums(0, 1)
+// @Success      200     {object}  []entity.Task
+// @Security     TokenAuth
+// @Router       /v1/tasks [get]
 func (controller *TaskController) Get(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
@@ -41,9 +50,9 @@ func (controller *TaskController) Get(c *gin.Context) {
 // @Description  ユーザのタスクを1件取得する
 // @Tags         task
 // @Produce      json
-// @Param        id  path  string  true  "タスクID"
+// @Param        id   path      string  true  "タスクID"
+// @Success      200      {object}  entity.Task
 // @Security     TokenAuth
-// @Success      200  {object}  entity.Task
 // @Router       /v1/tasks/{id} [get]
 func (controller *TaskController) GetByID(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
@@ -52,6 +61,16 @@ func (controller *TaskController) GetByID(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, task)
 }
 
+// Post godoc
+// @Summary      タスク追加
+// @Description  ユーザのタスクを追加する
+// @Tags         task
+// @Accept       json
+// @Produce      json
+// @Param        payload  body      entity.Task  true  "Payload Description"
+// @Success      200      {object}  entity.Task
+// @Security     TokenAuth
+// @Router       /v1/tasks [post]
 func (controller *TaskController) Post(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
@@ -67,6 +86,16 @@ func (controller *TaskController) Post(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, created)
 }
 
+// Put godoc
+// @Summary      タスク更新
+// @Description  ユーザのタスクを更新する
+// @Tags         task
+// @Accept       json
+// @Produce      json
+// @Param        payload  body      entity.Task  true  "Payload Description"
+// @Success      200  {object}  entity.Task
+// @Security     TokenAuth
+// @Router       /v1/tasks/{id} [put]
 func (controller *TaskController) Put(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
@@ -82,6 +111,15 @@ func (controller *TaskController) Put(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, updated)
 }
 
+// Delete godoc
+// @Summary      タスク削除
+// @Description  ユーザのタスクを削除する
+// @Tags         task
+// @Produce      json
+// @Param        id   path      string  true  "タスクID"
+// @Success      200  {object}  entity.Task
+// @Security     TokenAuth
+// @Router       /v1/tasks/{id} [delete]
 func (controller *TaskController) Delete(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
