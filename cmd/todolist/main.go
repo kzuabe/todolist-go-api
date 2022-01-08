@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"log"
 	"os"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/kzuabe/todolist-go-api/internal/router"
 	"github.com/kzuabe/todolist-go-api/internal/usecase"
 	"github.com/kzuabe/todolist-go-api/pkg/middleware"
+	"google.golang.org/api/option"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -43,7 +45,12 @@ func main() {
 	db.AutoMigrate(&repository.Task{})
 
 	// Firebase Admin セットアップ
-	firebaseApp, err := firebase.NewApp(context.Background(), nil)
+	data, err := base64.StdEncoding.DecodeString(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON"))
+	if err != nil {
+		log.Fatalf("error get credentials json: %v\n", err)
+	}
+	opt := option.WithCredentialsJSON(data)
+	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		log.Fatalf("error initializing app: %v\n", err)
 	}
