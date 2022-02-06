@@ -3,15 +3,25 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/kzuabe/todolist-go-api/docs"
-	"github.com/kzuabe/todolist-go-api/internal/controller"
-	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
+type taskController interface {
+	Get(c *gin.Context)
+	GetByID(c *gin.Context)
+	Post(c *gin.Context)
+	Put(c *gin.Context)
+	Delete(c *gin.Context)
+}
+
+type firebaseAuthMiddleware interface {
+	MiddlewareFunc() gin.HandlerFunc
+}
+
 type Handler struct {
-	TaskController         controller.TaskControllerInterface
-	FirebaseAuthMiddleware middleware.FirebaseAuthMiddlewareInterface
+	TaskController         taskController
+	FirebaseAuthMiddleware firebaseAuthMiddleware
 }
 
 func NewRouter(h Handler) *gin.Engine {

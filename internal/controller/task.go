@@ -6,20 +6,19 @@ import (
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/kzuabe/todolist-go-api/internal/entity"
-	"github.com/kzuabe/todolist-go-api/internal/usecase"
 	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 )
 
-type TaskController struct {
-	UseCase usecase.TaskUseCaseInterface
+type taskUseCase interface {
+	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
+	FetchByID(string, string) (entity.Task, error)
+	Create(entity.Task) (entity.Task, error)
+	Update(entity.Task) (entity.Task, error)
+	Delete(string, string) error
 }
 
-type TaskControllerInterface interface {
-	Get(c *gin.Context)
-	GetByID(c *gin.Context)
-	Post(c *gin.Context)
-	Put(c *gin.Context)
-	Delete(c *gin.Context)
+type TaskController struct {
+	UseCase taskUseCase
 }
 
 // Get godoc

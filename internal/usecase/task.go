@@ -5,19 +5,18 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kzuabe/todolist-go-api/internal/entity"
-	"github.com/kzuabe/todolist-go-api/internal/repository"
 )
 
-type TaskUseCase struct {
-	Repository repository.TaskRepositoryInterface
-}
-
-type TaskUseCaseInterface interface {
+type taskRepository interface {
 	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
 	FetchByID(string, string) (entity.Task, error)
 	Create(entity.Task) (entity.Task, error)
 	Update(entity.Task) (entity.Task, error)
 	Delete(string, string) error
+}
+
+type TaskUseCase struct {
+	Repository taskRepository
 }
 
 func (useCase *TaskUseCase) Fetch(params entity.TaskFetchParam) ([]entity.Task, error) {

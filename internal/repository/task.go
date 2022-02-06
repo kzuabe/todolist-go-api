@@ -9,14 +9,6 @@ type TaskRepository struct {
 	DB *gorm.DB
 }
 
-type TaskRepositoryInterface interface {
-	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
-	FetchByID(string, string) (entity.Task, error)
-	Create(entity.Task) (entity.Task, error)
-	Update(entity.Task) (entity.Task, error)
-	Delete(string, string) error
-}
-
 type Task struct {
 	gorm.Model
 	UUID        string
