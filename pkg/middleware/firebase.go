@@ -15,6 +15,10 @@ type FirebaseAuthMiddleware struct {
 	Client *auth.Client
 }
 
+func NewFirebaseAuthMiddleware(client *auth.Client) *FirebaseAuthMiddleware {
+	return &FirebaseAuthMiddleware{Client: client}
+}
+
 func (middleware *FirebaseAuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idToken, ok := extractTokenFromAuthHeader(c.Request.Header.Get("Authorization"))

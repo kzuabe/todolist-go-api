@@ -9,6 +9,10 @@ type TaskRepository struct {
 	DB *gorm.DB
 }
 
+func NewTaskRepository(db *gorm.DB) *TaskRepository {
+	return &TaskRepository{DB: db}
+}
+
 type Task struct {
 	gorm.Model
 	UUID        string

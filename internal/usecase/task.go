@@ -19,6 +19,10 @@ type TaskUseCase struct {
 	Repository taskRepository
 }
 
+func NewTaskUseCase(repository taskRepository) *TaskUseCase {
+	return &TaskUseCase{Repository: repository}
+}
+
 func (useCase *TaskUseCase) Fetch(params entity.TaskFetchParam) ([]entity.Task, error) {
 	return useCase.Repository.Fetch(params)
 }

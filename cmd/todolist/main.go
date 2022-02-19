@@ -52,19 +52,13 @@ func main() {
 		log.Fatalf("error getting Auth client: %v\n", err)
 	}
 
-	h := router.Handler{
-		TaskController: &controller.TaskController{
-			UseCase: &usecase.TaskUseCase{
-				Repository: &repository.TaskRepository{
-					DB: db,
-				},
-			},
-		},
-		FirebaseAuthMiddleware: &middleware.FirebaseAuthMiddleware{
-			Client: firebaseAuthClient,
-		},
-	}
-	r := router.NewRouter(h)
+	repository := repository.NewTaskRepository(db)
+	usecase := usecase.NewTaskUseCase(repository)
+	controller := controller.NewTaskController(usecase)
+	faMiddleware := middleware.NewFirebaseAuthMiddleware(firebaseAuthClient)
+	handler := router.NewHandler(controller, faMiddleware)
+
+	r := router.NewRouter(handler)
 
 	r.Run(":8080")
 }

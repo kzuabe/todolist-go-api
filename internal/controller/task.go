@@ -21,6 +21,10 @@ type TaskController struct {
 	UseCase taskUseCase
 }
 
+func NewTaskController(useCase taskUseCase) *TaskController {
+	return &TaskController{UseCase: useCase}
+}
+
 // Get godoc
 // @Summary      タスク取得
 // @Description  ユーザのタスクを複数件取得する

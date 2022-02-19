@@ -24,6 +24,10 @@ type Handler struct {
 	FirebaseAuthMiddleware firebaseAuthMiddleware
 }
 
+func NewHandler(tc taskController, fam firebaseAuthMiddleware) Handler {
+	return Handler{TaskController: tc, FirebaseAuthMiddleware: fam}
+}
+
 func NewRouter(h Handler) *gin.Engine {
 	router := gin.Default()
 
