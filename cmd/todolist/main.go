@@ -35,9 +35,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("error initializing firebase admin: %v\n", err)
 	}
-	handler := router.NewHandler(controller, faMiddleware)
 
-	r := router.NewRouter(handler)
+	r := router.NewRouter(controller, faMiddleware)
 
 	r.Run(":8080")
 }
