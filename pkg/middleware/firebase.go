@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -15,8 +16,17 @@ type FirebaseAuthMiddleware struct {
 	Client *auth.Client
 }
 
-func NewFirebaseAuthMiddleware(client *auth.Client) *FirebaseAuthMiddleware {
-	return &FirebaseAuthMiddleware{Client: client}
+// FirebaseAdminの初期化（Clientのセットアップ）
+func NewFirebaseAuthMiddleware() (*FirebaseAuthMiddleware, error) {
+	app, err := firebase.NewApp(context.Background(), nil)
+	if err != nil {
+		return nil, err
+	}
+	client, err := app.Auth(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return &FirebaseAuthMiddleware{Client: client}, nil
 }
 
 func (middleware *FirebaseAuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
