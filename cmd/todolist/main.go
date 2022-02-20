@@ -5,11 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/kzuabe/todolist-go-api/internal/config"
-	"github.com/kzuabe/todolist-go-api/internal/controller"
-	"github.com/kzuabe/todolist-go-api/internal/repository"
-	"github.com/kzuabe/todolist-go-api/internal/router"
-	"github.com/kzuabe/todolist-go-api/internal/usecase"
-	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 )
 
 // @title                       TodoList API
@@ -19,24 +14,15 @@ import (
 // @in                          header
 // @name                        Authorization
 func main() {
-	// 環境ごとのセットアップ
+	// 本番・開発環境のセットアップ
 	if config.API_ENV == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	db, err := repository.NewDB()
+	r, err := initializeRouter()
 	if err != nil {
-		panic("failed to connect database")
+		log.Fatalf("error initializing: %v\n", err)
 	}
-	repository := repository.NewTaskRepository(db)
-	usecase := usecase.NewTaskUseCase(repository)
-	controller := controller.NewTaskController(usecase)
-	faMiddleware, err := middleware.NewFirebaseAuthMiddleware()
-	if err != nil {
-		log.Fatalf("error initializing firebase admin: %v\n", err)
-	}
-
-	r := router.NewRouter(controller, faMiddleware)
 
 	r.Run(":8080")
 }

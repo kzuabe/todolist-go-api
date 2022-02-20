@@ -9,7 +9,7 @@ import (
 	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 )
 
-type taskUseCase interface {
+type TaskUseCaseInterface interface {
 	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
 	FetchByID(string, string) (entity.Task, error)
 	Create(entity.Task) (entity.Task, error)
@@ -18,10 +18,10 @@ type taskUseCase interface {
 }
 
 type TaskController struct {
-	UseCase taskUseCase
+	UseCase TaskUseCaseInterface
 }
 
-func NewTaskController(useCase taskUseCase) *TaskController {
+func NewTaskController(useCase TaskUseCaseInterface) *TaskController {
 	return &TaskController{UseCase: useCase}
 }
 
