@@ -42,7 +42,10 @@ func (controller *TaskController) Get(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	params.UserID = token.UID
+	if params.UserID != token.UID {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": "許可されていないユーザー情報です"})
+		return
+	}
 
 	tasks, _ := controller.UseCase.Fetch(params)
 	c.IndentedJSON(http.StatusOK, tasks)
@@ -59,8 +62,11 @@ func (controller *TaskController) Get(c *gin.Context) {
 // @Router       /v1/tasks/{id} [get]
 func (controller *TaskController) GetByID(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
+
 	id := c.Param("id")
-	task, _ := controller.UseCase.FetchByID(id, token.UID)
+	userID := token.UID
+
+	task, _ := controller.UseCase.FetchByID(id, userID)
 	c.IndentedJSON(http.StatusOK, task)
 }
 
@@ -82,7 +88,10 @@ func (controller *TaskController) Post(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	task.UserID = token.UID
+	if task.UserID != token.UID {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": "ユーザーIDが認証情報と一致しません"})
+		return
+	}
 
 	created, _ := controller.UseCase.Create(task)
 
@@ -107,8 +116,14 @@ func (controller *TaskController) Put(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	task.ID = c.Param("id")
-	task.UserID = token.UID
+	if task.ID != c.Param("id") {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": "タスクIDが一致しません"})
+		return
+	}
+	if task.UserID != token.UID {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": "ユーザーIDが認証情報と一致しません"})
+		return
+	}
 
 	updated, _ := controller.UseCase.Update(task)
 	c.IndentedJSON(http.StatusCreated, updated)
