@@ -30,8 +30,9 @@ func NewTaskController(useCase TaskUseCaseInterface) *TaskController {
 // @Description  ユーザのタスクを複数件取得する
 // @Tags         task
 // @Produce      json
-// @Param        status  query     int  false  "タスクステータス 0: 未着手 1: 完了"  Enums(0, 1)
-// @Success      200     {object}  []entity.Task
+// @Param        user_id  query     string  true   "取得するタスクのユーザーID"
+// @Param        status   query     int     false  "タスクステータス 0: 未着手 1: 完了"  Enums(0, 1)
+// @Success      200      {object}  []entity.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks [get]
 func (controller *TaskController) Get(c *gin.Context) {

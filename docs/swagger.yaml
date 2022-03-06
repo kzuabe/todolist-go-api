@@ -11,6 +11,9 @@ definitions:
         type: integer
       title:
         type: string
+      user_id:
+        description: ユーザID
+        type: string
     type: object
 info:
   contact: {}
@@ -22,6 +25,11 @@ paths:
     get:
       description: ユーザのタスクを複数件取得する
       parameters:
+      - description: 取得するタスクのユーザーID
+        in: query
+        name: user_id
+        required: true
+        type: string
       - description: 'タスクステータス 0: 未着手 1: 完了'
         enum:
         - 0

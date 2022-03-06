@@ -40,6 +40,13 @@ var doc = `{
                 "summary": "タスク取得",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "取得するタスクのユーザーID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "enum": [
                             0,
                             1
@@ -220,6 +227,10 @@ var doc = `{
                     "type": "integer"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "description": "ユーザID",
                     "type": "string"
                 }
             }
