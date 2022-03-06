@@ -1,0 +1,41 @@
+name: Swag
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  update_swag_docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+
+    - name: Cache Go modules
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Install Swag
+      run: go install github.com/swaggo/swag/cmd/swag@latest
+
+    - name: Format and Generate Swag Docs
+      run: swag fmt -g ./cmd/todolist/main.go && swag init -g ./cmd/todolist/main.go
+
+    - name: Create Pull Request
+      id: cpr
+      uses: peter-evans/create-pull-request@v3
+      with:
+        commit-message: 'docs(auto): automated update swagger docs'
+        title: '[Auto] Update Swagger Docs'
+        body: |
+          Update swagger docs from ${GITHUB_SHA}
