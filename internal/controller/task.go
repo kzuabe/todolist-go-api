@@ -5,15 +5,15 @@ import (
 
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
-	"github.com/kzuabe/todolist-go-api/internal/entity"
+	"github.com/kzuabe/todolist-go-api/internal/model"
 	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 )
 
 type TaskUseCaseInterface interface {
-	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
-	FetchByID(string, string) (entity.Task, error)
-	Create(entity.Task) (entity.Task, error)
-	Update(entity.Task) (entity.Task, error)
+	Fetch(model.TaskFetchParam) ([]model.Task, error)
+	FetchByID(string, string) (model.Task, error)
+	Create(model.Task) (model.Task, error)
+	Update(model.Task) (model.Task, error)
 	Delete(string, string) error
 }
 
@@ -32,13 +32,13 @@ func NewTaskController(useCase TaskUseCaseInterface) *TaskController {
 // @Produce      json
 // @Param        user_id  query     string  true   "取得するタスクのユーザーID"
 // @Param        status   query     int     false  "タスクステータス 0: 未着手 1: 完了"  Enums(0, 1)
-// @Success      200      {object}  []entity.Task
+// @Success      200      {object}  []model.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks [get]
 func (controller *TaskController) Get(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
-	params := entity.TaskFetchParam{}
+	params := model.TaskFetchParam{}
 	if err := c.ShouldBindQuery(&params); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -58,7 +58,7 @@ func (controller *TaskController) Get(c *gin.Context) {
 // @Tags         task
 // @Produce      json
 // @Param        id   path      string  true  "タスクID"
-// @Success      200      {object}  entity.Task
+// @Success      200      {object}  model.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [get]
 func (controller *TaskController) GetByID(c *gin.Context) {
@@ -77,14 +77,14 @@ func (controller *TaskController) GetByID(c *gin.Context) {
 // @Tags         task
 // @Accept       json
 // @Produce      json
-// @Param        payload  body      entity.Task  true  "Payload Description"
-// @Success      200      {object}  entity.Task
+// @Param        payload  body      model.Task  true  "Payload Description"
+// @Success      200      {object}  model.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks [post]
 func (controller *TaskController) Post(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
-	task := entity.Task{}
+	task := model.Task{}
 	if err := c.ShouldBindJSON(&task); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -105,14 +105,14 @@ func (controller *TaskController) Post(c *gin.Context) {
 // @Tags         task
 // @Accept       json
 // @Produce      json
-// @Param        payload  body      entity.Task  true  "Payload Description"
-// @Success      200  {object}  entity.Task
+// @Param        payload  body      model.Task  true  "Payload Description"
+// @Success      200  {object}  model.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [put]
 func (controller *TaskController) Put(c *gin.Context) {
 	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
-	task := entity.Task{}
+	task := model.Task{}
 	if err := c.ShouldBindJSON(&task); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -136,7 +136,7 @@ func (controller *TaskController) Put(c *gin.Context) {
 // @Tags         task
 // @Produce      json
 // @Param        id   path      string  true  "タスクID"
-// @Success      200  {object}  entity.Task
+// @Success      200  {object}  model.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [delete]
 func (controller *TaskController) Delete(c *gin.Context) {

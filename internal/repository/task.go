@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/kzuabe/todolist-go-api/internal/entity"
+	"github.com/kzuabe/todolist-go-api/internal/model"
 	"gorm.io/gorm"
 )
 
@@ -22,44 +22,44 @@ type Task struct {
 	Status      int
 }
 
-func (repository *TaskRepository) Fetch(params entity.TaskFetchParam) ([]entity.Task, error) {
+func (repository *TaskRepository) Fetch(params model.TaskFetchParam) ([]model.Task, error) {
 	tx := repository.DB.Session(&gorm.Session{})
 	if status := params.Status; status != nil {
 		tx = tx.Where("status = ?", status)
 	}
 
-	dbTasks := []Task{} // FIXME: RepositoryのTaskにする
+	dbTasks := []Task{}
 	result := tx.Find(&dbTasks, "user_id = ?", params.UserID)
 
-	tasks := make([]entity.Task, len(dbTasks))
+	tasks := make([]model.Task, len(dbTasks))
 	for i, t := range dbTasks {
-		tasks[i] = toEntityTask(t)
+		tasks[i] = t.toModel()
 	}
 	return tasks, result.Error
 }
 
-func (repository *TaskRepository) FetchByID(id string, userID string) (entity.Task, error) {
+func (repository *TaskRepository) FetchByID(id string, userID string) (model.Task, error) {
 	t := Task{}
 
 	result := repository.DB.First(&t, "uuid = ?", id)
 	if t.UserID != userID { // TODO: エラーハンドリング
-		return entity.Task{}, nil
+		return model.Task{}, nil
 	}
-	return toEntityTask(t), result.Error
+	return t.toModel(), result.Error
 }
 
-func (repository *TaskRepository) Create(task entity.Task) (entity.Task, error) {
+func (repository *TaskRepository) Create(task model.Task) (model.Task, error) {
 	t := toDBTask(task)
 	result := repository.DB.Create(&t)
-	created := toEntityTask(t)
+	created := t.toModel()
 	return created, result.Error
 }
 
-func (repository *TaskRepository) Update(task entity.Task) (entity.Task, error) {
+func (repository *TaskRepository) Update(task model.Task) (model.Task, error) {
 	t := Task{}
 	_ = repository.DB.First(&t, "uuid = ?", task.ID) // TODO: エラーハンドリング
 	if t.UserID != task.UserID {
-		return entity.Task{}, nil
+		return model.Task{}, nil
 	}
 
 	// 更新内容
@@ -68,7 +68,7 @@ func (repository *TaskRepository) Update(task entity.Task) (entity.Task, error) 
 	t.Status = task.Status
 
 	result := repository.DB.Save(&t)
-	return toEntityTask(t), result.Error
+	return t.toModel(), result.Error
 }
 
 func (repository *TaskRepository) Delete(id string, userID string) error {
@@ -76,7 +76,7 @@ func (repository *TaskRepository) Delete(id string, userID string) error {
 	return result.Error
 }
 
-func toDBTask(task entity.Task) Task {
+func toDBTask(task model.Task) Task {
 	t := Task{
 		UUID:        task.ID,
 		UserID:      task.UserID,
@@ -87,8 +87,8 @@ func toDBTask(task entity.Task) Task {
 	return t
 }
 
-func toEntityTask(task Task) entity.Task {
-	t := entity.Task{
+func (task *Task) toModel() model.Task {
+	t := model.Task{
 		ID:          task.UUID,
 		UserID:      task.UserID,
 		Title:       task.Title,

@@ -1,4 +1,4 @@
-package entity
+package model
 
 type Task struct {
 	ID          string `json:"id"`          // タスクID（自動で生成されるUUID）
