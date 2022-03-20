@@ -1,15 +1,20 @@
-FROM golang:1.17 AS builder
+# ref: https://docs.docker.com/language/golang/build-images/
 
-WORKDIR /go/src/todolist-go-api
+# Build
+FROM golang:1.17-bullseye AS build
+
+WORKDIR /src
+
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+
 COPY . .
 
-RUN go get -d -v ./...
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app ./cmd/todolist
+RUN go build -o /server ./cmd/todolist
 
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+# Deploy
+FROM gcr.io/distroless/base-debian11
 
-WORKDIR /root/
-
-COPY --from=builder /go/src/todolist-go-api/app .
-CMD ["./app"]
+COPY --from=build /server /server
+CMD ["/server"]
