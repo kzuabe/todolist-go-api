@@ -1,11 +1,26 @@
 package config
 
-import "os"
+import (
+	"os"
 
-var API_ENV string
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm/logger"
+)
+
+// 設定値
+var GinMode string
+var GormLogLevel logger.LogLevel
 var DSN string
 
 func init() {
-	API_ENV = os.Getenv("API_ENV")
+	// 環境ごとの設定値をセット（デフォルトは本番設定）
+	switch env := os.Getenv("API_ENV"); env {
+	case "develop":
+		GinMode = gin.DebugMode
+		GormLogLevel = logger.Info
+	default:
+		GinMode = gin.ReleaseMode
+		GormLogLevel = logger.Error
+	}
 	DSN = os.Getenv("DSN")
 }

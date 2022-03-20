@@ -14,10 +14,7 @@ import (
 // @in                          header
 // @name                        Authorization
 func main() {
-	// 本番・開発環境のセットアップ
-	if config.API_ENV == "production" {
-		gin.SetMode(gin.ReleaseMode)
-	}
+	gin.SetMode(config.GinMode)
 
 	r, err := initializeRouter()
 	if err != nil {
