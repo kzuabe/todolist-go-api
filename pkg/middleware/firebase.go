@@ -33,15 +33,13 @@ func (middleware *FirebaseAuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idToken, ok := extractTokenFromAuthHeader(c.Request.Header.Get("Authorization"))
 		if !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "need token"})
-			c.Abort()
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		token, err := middleware.Client.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "invalid token"})
-			c.Abort()
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 		c.Set(CONTEXT_TOKEN_KEY, token)
