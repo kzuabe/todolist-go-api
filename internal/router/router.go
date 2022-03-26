@@ -12,6 +12,8 @@ import (
 func NewRouter(tc *controller.TaskController, fam *middleware.FirebaseAuthMiddleware) *gin.Engine {
 	router := gin.Default()
 
+	router.Use(ErrorHandler())
+
 	v1 := router.Group("/v1")
 	v1.Use(fam.MiddlewareFunc())
 	{

@@ -67,7 +67,13 @@ func (controller *TaskController) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	userID := token.UID
 
-	task, _ := controller.UseCase.FetchByID(id, userID)
+	task, err := controller.UseCase.FetchByID(id, userID)
+	// NG
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	// OK
 	c.IndentedJSON(http.StatusOK, task)
 }
 
