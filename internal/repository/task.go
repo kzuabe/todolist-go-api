@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"net/http"
+
 	"github.com/kzuabe/todolist-go-api/internal/model"
 	"gorm.io/gorm"
 )
@@ -13,15 +15,6 @@ func NewTaskRepository(db *gorm.DB) *TaskRepository {
 	return &TaskRepository{DB: db}
 }
 
-type Task struct {
-	gorm.Model
-	UUID        string
-	UserID      string
-	Title       string
-	Description string
-	Status      int
-}
-
 func (repository *TaskRepository) Fetch(params model.TaskFetchParam) ([]model.Task, error) {
 	tx := repository.DB.Session(&gorm.Session{})
 	if status := params.Status; status != nil {
@@ -31,54 +24,97 @@ func (repository *TaskRepository) Fetch(params model.TaskFetchParam) ([]model.Ta
 	dbTasks := []Task{}
 	result := tx.Find(&dbTasks, "user_id = ?", params.UserID)
 
+	if result.Error != nil {
+		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
+		return []model.Task{}, e
+	}
+
 	tasks := make([]model.Task, len(dbTasks))
 	for i, t := range dbTasks {
 		tasks[i] = t.toModel()
 	}
-	return tasks, result.Error
+	return tasks, nil
 }
 
 func (repository *TaskRepository) FetchByID(id string, userID string) (model.Task, error) {
 	t := Task{}
 
 	result := repository.DB.First(&t, "uuid = ?", id)
-	if t.UserID != userID { // TODO: エラーハンドリング
-		return model.Task{}, nil
+
+	if result.Error != nil {
+		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
+		return model.Task{}, e
 	}
-	return t.toModel(), result.Error
+	if t.UserID != userID { // リクエストユーザーとタスクのユーザーが異なる場合
+		e := &model.Error{StatusCode: http.StatusForbidden, Message: "許可されていないユーザー"}
+		return model.Task{}, e
+	}
+
+	fetched := t.toModel()
+	return fetched, nil
 }
 
 func (repository *TaskRepository) Create(task model.Task) (model.Task, error) {
 	t := toDBTask(task)
 	result := repository.DB.Create(&t)
+
+	if result.Error != nil {
+		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
+		return model.Task{}, e
+	}
+
 	created := t.toModel()
 	return created, result.Error
 }
 
 func (repository *TaskRepository) Update(task model.Task) (model.Task, error) {
 	t := Task{}
-	_ = repository.DB.First(&t, "uuid = ?", task.ID) // TODO: エラーハンドリング
-	if t.UserID != task.UserID {
-		return model.Task{}, nil
+	result := repository.DB.First(&t, "uuid = ?", task.ID)
+
+	if result.Error != nil {
+		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
+		return model.Task{}, e
+	}
+	if t.UserID != task.UserID { // リクエストユーザーとタスクのユーザーが異なる場合
+		e := &model.Error{StatusCode: http.StatusForbidden, Message: "許可されていないユーザー"}
+		return model.Task{}, e
 	}
 
-	// 更新内容
-	t.Title = task.Title
-	t.Description = task.Description
-	t.Status = task.Status
+	// データ更新
+	t.updateFromModel(task)
 
-	result := repository.DB.Save(&t)
-	return t.toModel(), result.Error
+	result = repository.DB.Save(&t)
+
+	if result.Error != nil {
+		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
+		return model.Task{}, e
+	}
+
+	updated := t.toModel()
+	return updated, nil
 }
 
 func (repository *TaskRepository) Delete(id string, userID string) error {
 	result := repository.DB.Delete(&Task{}, "uuid = ? AND user_id = ?", id, userID)
-	return result.Error
+	if result.Error != nil {
+		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
+		return e
+	}
+	return nil
 }
 
-func toDBTask(task model.Task) Task {
-	t := Task{
-		UUID:        task.ID,
+type Task struct {
+	gorm.Model
+	UUID        string
+	UserID      string
+	Title       string
+	Description string
+	Status      int
+}
+
+func (task *Task) toModel() model.Task {
+	t := model.Task{
+		ID:          task.UUID,
 		UserID:      task.UserID,
 		Title:       task.Title,
 		Description: task.Description,
@@ -87,9 +123,16 @@ func toDBTask(task model.Task) Task {
 	return t
 }
 
-func (task *Task) toModel() model.Task {
-	t := model.Task{
-		ID:          task.UUID,
+// 更新用
+func (task *Task) updateFromModel(t model.Task) {
+	task.Title = t.Title
+	task.Description = t.Description
+	task.Status = t.Status
+}
+
+func toDBTask(task model.Task) Task {
+	t := Task{
+		UUID:        task.ID,
 		UserID:      task.UserID,
 		Title:       task.Title,
 		Description: task.Description,
