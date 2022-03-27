@@ -17,16 +17,18 @@ func NewTaskRepository(db *gorm.DB) *TaskRepository {
 
 func (repository *TaskRepository) Fetch(params model.TaskFetchParam) ([]model.Task, error) {
 	tx := repository.DB.Session(&gorm.Session{})
+	if userID := params.UserID; userID != "" {
+		tx = tx.Where("user_id = ?", userID)
+	}
 	if status := params.Status; status != nil {
 		tx = tx.Where("status = ?", status)
 	}
 
 	dbTasks := []Task{}
-	result := tx.Find(&dbTasks, "user_id = ?", params.UserID)
+	result := tx.Find(&dbTasks)
 
-	if result.Error != nil {
-		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
-		return []model.Task{}, e
+	if err := result.Error; err != nil {
+		return []model.Task{}, err
 	}
 
 	tasks := make([]model.Task, len(dbTasks))

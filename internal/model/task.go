@@ -9,6 +9,6 @@ type Task struct {
 }
 
 type TaskFetchParam struct {
-	UserID string `form:"user_id"`
+	UserID string `form:"-"`
 	Status *int   `form:"status"`
 }

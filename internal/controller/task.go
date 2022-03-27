@@ -30,25 +30,26 @@ func NewTaskController(useCase TaskUseCaseInterface) *TaskController {
 // @Description  ユーザのタスクを複数件取得する
 // @Tags         task
 // @Produce      json
-// @Param        user_id  query     string  true   "取得するタスクのユーザーID"
 // @Param        status   query     int     false  "タスクステータス 0: 未着手 1: 完了"  Enums(0, 1)
 // @Success      200      {object}  []model.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks [get]
 func (controller *TaskController) Get(c *gin.Context) {
-	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
+	token := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
 	params := model.TaskFetchParam{}
 	if err := c.ShouldBindQuery(&params); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		e := &model.Error{StatusCode: http.StatusBadRequest, Message: err.Error()}
+		c.Error(e)
 		return
 	}
-	if params.UserID != token.UID {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"message": "許可されていないユーザー情報です"})
-		return
-	}
+	params.UserID = token.UID
 
-	tasks, _ := controller.UseCase.Fetch(params)
+	tasks, err := controller.UseCase.Fetch(params)
+	if err != nil {
+		c.Error(err)
+		return
+	}
 	c.IndentedJSON(http.StatusOK, tasks)
 }
 
