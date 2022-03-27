@@ -10,7 +10,7 @@ type TaskRepositoryInterface interface {
 	Fetch(model.TaskFetchParam) ([]model.Task, error)
 	FetchByID(string) (model.Task, error)
 	Create(model.Task) (model.Task, error)
-	Update(model.Task) (model.Task, error)
+	Update(model.Task, bool) (model.Task, error)
 	Delete(string, string) error
 }
 
@@ -46,7 +46,8 @@ func (useCase *TaskUseCase) Create(task model.Task) (model.Task, error) {
 }
 
 func (useCase *TaskUseCase) Update(task model.Task) (model.Task, error) {
-	return useCase.Repository.Update(task)
+	needIdentify := true
+	return useCase.Repository.Update(task, needIdentify)
 }
 
 func (useCase *TaskUseCase) Delete(id string, userID string) error {

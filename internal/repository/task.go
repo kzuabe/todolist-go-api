@@ -68,17 +68,18 @@ func (repository *TaskRepository) Create(task model.Task) (model.Task, error) {
 	return created, result.Error
 }
 
-func (repository *TaskRepository) Update(task model.Task) (model.Task, error) {
+func (repository *TaskRepository) Update(task model.Task, needIdentify bool) (model.Task, error) {
 	t := Task{}
 	result := repository.DB.First(&t, "uuid = ?", task.ID)
 
-	if result.Error != nil {
-		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
-		return model.Task{}, e
+	if err := result.Error; err != nil {
+		return model.Task{}, err
 	}
-	if t.UserID != task.UserID { // リクエストユーザーとタスクのユーザーが異なる場合
-		e := &model.Error{StatusCode: http.StatusForbidden, Message: "許可されていないユーザー"}
-		return model.Task{}, e
+
+	// needIdentify = true の場合は既に登録済みのユーザー以外の更新をエラーにする
+	if needIdentify && t.UserID != task.UserID {
+		err := &model.Error{StatusCode: http.StatusForbidden, Message: "許可されていないタスクの更新です"}
+		return model.Task{}, err
 	}
 
 	// データ更新
@@ -86,9 +87,8 @@ func (repository *TaskRepository) Update(task model.Task) (model.Task, error) {
 
 	result = repository.DB.Save(&t)
 
-	if result.Error != nil {
-		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
-		return model.Task{}, e
+	if err := result.Error; err != nil {
+		return model.Task{}, err
 	}
 
 	updated := t.toModel()
@@ -124,8 +124,9 @@ func (task *Task) toModel() model.Task {
 	return t
 }
 
-// 更新用
+// model.TaskによるDBフィールドの更新（IDおよびUUIDは変更不可）
 func (task *Task) updateFromModel(t model.Task) {
+	task.UserID = t.UserID
 	task.Title = t.Title
 	task.Description = t.Description
 	task.Status = t.Status

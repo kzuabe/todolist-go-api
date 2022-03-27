@@ -112,6 +112,7 @@ func (controller *TaskController) Post(c *gin.Context) {
 // @Tags         task
 // @Accept       json
 // @Produce      json
+// @Param        id   path      string  true  "タスクID"
 // @Param        payload  body      model.Task  true  "Payload Description"
 // @Success      200  {object}  model.Task
 // @Security     TokenAuth
@@ -121,19 +122,19 @@ func (controller *TaskController) Put(c *gin.Context) {
 
 	task := model.Task{}
 	if err := c.ShouldBindJSON(&task); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
-	if task.ID != c.Param("id") {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"message": "タスクIDが一致しません"})
-		return
-	}
-	if task.UserID != token.UID {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"message": "ユーザーIDが認証情報と一致しません"})
+		e := &model.Error{StatusCode: http.StatusBadRequest, Message: err.Error()}
+		c.Error(e)
 		return
 	}
 
-	updated, _ := controller.UseCase.Update(task)
+	// IDとUserIDは他パラメータからセットし直す
+	task.ID = c.Param("id")
+	task.UserID = token.UID
+
+	updated, err := controller.UseCase.Update(task)
+	if err != nil {
+		c.Error(err)
+	}
 	c.IndentedJSON(http.StatusCreated, updated)
 }
 
