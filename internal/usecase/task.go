@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/google/uuid"
@@ -9,7 +10,7 @@ import (
 
 type TaskRepositoryInterface interface {
 	Fetch(model.TaskFetchParam) ([]model.Task, error)
-	FetchByID(string, string) (model.Task, error)
+	FetchByID(string) (model.Task, error)
 	Create(model.Task) (model.Task, error)
 	Update(model.Task) (model.Task, error)
 	Delete(string, string) error
@@ -28,7 +29,18 @@ func (useCase *TaskUseCase) Fetch(params model.TaskFetchParam) ([]model.Task, er
 }
 
 func (useCae *TaskUseCase) FetchByID(id string, userID string) (model.Task, error) {
-	return useCae.Repository.FetchByID(id, userID)
+	task, err := useCae.Repository.FetchByID(id)
+	if err != nil {
+		return model.Task{}, err
+	}
+
+	// リクエストユーザーとタスクのユーザーが異なる場合はエラーを返す
+	if task.UserID != userID {
+		err = &model.Error{StatusCode: http.StatusForbidden, Message: "許可されていないユーザーからのリクエストです"}
+		return model.Task{}, err
+	}
+
+	return task, nil
 }
 
 func (useCase *TaskUseCase) Create(task model.Task) (model.Task, error) {

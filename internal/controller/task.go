@@ -63,18 +63,17 @@ func (controller *TaskController) Get(c *gin.Context) {
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [get]
 func (controller *TaskController) GetByID(c *gin.Context) {
-	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
+	token := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
 	id := c.Param("id")
 	userID := token.UID
 
 	task, err := controller.UseCase.FetchByID(id, userID)
-	// NG
 	if err != nil {
 		c.Error(err)
 		return
 	}
-	// OK
+
 	c.IndentedJSON(http.StatusOK, task)
 }
 

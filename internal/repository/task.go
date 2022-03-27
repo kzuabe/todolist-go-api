@@ -38,18 +38,13 @@ func (repository *TaskRepository) Fetch(params model.TaskFetchParam) ([]model.Ta
 	return tasks, nil
 }
 
-func (repository *TaskRepository) FetchByID(id string, userID string) (model.Task, error) {
+func (repository *TaskRepository) FetchByID(id string) (model.Task, error) {
 	t := Task{}
 
 	result := repository.DB.First(&t, "uuid = ?", id)
 
-	if result.Error != nil {
-		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
-		return model.Task{}, e
-	}
-	if t.UserID != userID { // リクエストユーザーとタスクのユーザーが異なる場合
-		e := &model.Error{StatusCode: http.StatusForbidden, Message: "許可されていないユーザー"}
-		return model.Task{}, e
+	if err := result.Error; err != nil {
+		return model.Task{}, err
 	}
 
 	fetched := t.toModel()
