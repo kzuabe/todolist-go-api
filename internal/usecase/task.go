@@ -2,9 +2,7 @@ package usecase
 
 import (
 	"net/http"
-	"strings"
 
-	"github.com/google/uuid"
 	"github.com/kzuabe/todolist-go-api/internal/model"
 )
 
@@ -44,8 +42,6 @@ func (useCae *TaskUseCase) FetchByID(id string, userID string) (model.Task, erro
 }
 
 func (useCase *TaskUseCase) Create(task model.Task) (model.Task, error) {
-	uuid := strings.ReplaceAll(uuid.NewString(), "-", "") // UUIDの生成（ハイフン除去済み）
-	task.ID = uuid
 	return useCase.Repository.Create(task)
 }
 

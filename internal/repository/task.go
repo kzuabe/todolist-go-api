@@ -2,7 +2,9 @@ package repository
 
 import (
 	"net/http"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/kzuabe/todolist-go-api/internal/model"
 	"gorm.io/gorm"
 )
@@ -53,11 +55,13 @@ func (repository *TaskRepository) FetchByID(id string) (model.Task, error) {
 
 func (repository *TaskRepository) Create(task model.Task) (model.Task, error) {
 	t := toDBTask(task)
+	id := strings.ReplaceAll(uuid.NewString(), "-", "") // UUIDの生成（ハイフン除去済み）
+	t.UUID = id                                         // 生成時はUUIDを自動でセット
+
 	result := repository.DB.Create(&t)
 
-	if result.Error != nil {
-		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
-		return model.Task{}, e
+	if err := result.Error; err != nil {
+		return model.Task{}, err
 	}
 
 	created := t.toModel()

@@ -88,19 +88,20 @@ func (controller *TaskController) GetByID(c *gin.Context) {
 // @Security     TokenAuth
 // @Router       /v1/tasks [post]
 func (controller *TaskController) Post(c *gin.Context) {
-	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
+	token := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
 	task := model.Task{}
 	if err := c.ShouldBindJSON(&task); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		e := &model.Error{StatusCode: http.StatusBadRequest, Message: err.Error()}
+		c.Error(e)
 		return
 	}
-	if task.UserID != token.UID {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"message": "ユーザーIDが認証情報と一致しません"})
-		return
-	}
+	task.UserID = token.UID // タスクのUserIDはトークンの値をセットし直す
 
-	created, _ := controller.UseCase.Create(task)
+	created, err := controller.UseCase.Create(task)
+	if err != nil {
+		c.Error(err)
+	}
 
 	c.IndentedJSON(http.StatusCreated, created)
 }
