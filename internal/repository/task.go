@@ -71,9 +71,8 @@ func (repository *TaskRepository) Create(task model.Task) (model.Task, error) {
 func (repository *TaskRepository) Update(task model.Task) (model.Task, error) {
 	dbTask := toDBTask(task)
 
-	// NOTE: UUID以外のフィールドを更新する
-	// 参考: https://gorm.io/docs/update.html
-	result := repository.DB.Model(&Task{}).Where("uuid = ?", dbTask.UUID).Select("*").Omit("UUID").Updates(dbTask)
+	tx := repository.DB.Model(&Task{}).Where("uuid = ?", dbTask.UUID)               // UUIDが一致するデータを対象とする
+	result := tx.Select("UserID", "Title", "Description", "Status").Updates(dbTask) // WARNING: カラム追加時はここにフィールド名の追加が必要
 
 	if err := result.Error; err != nil {
 		return model.Task{}, err
