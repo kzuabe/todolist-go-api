@@ -112,14 +112,6 @@ func (task *Task) toModel() model.Task {
 	return t
 }
 
-// model.TaskによるDBフィールドの更新（IDおよびUUIDは変更不可）
-func (task *Task) updateFromModel(t model.Task) {
-	task.UserID = t.UserID
-	task.Title = t.Title
-	task.Description = t.Description
-	task.Status = t.Status
-}
-
 func toDBTask(task model.Task) Task {
 	t := Task{
 		UUID:        task.ID,
