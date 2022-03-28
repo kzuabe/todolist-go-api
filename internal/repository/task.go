@@ -41,62 +41,51 @@ func (repository *TaskRepository) Fetch(params model.TaskFetchParam) ([]model.Ta
 }
 
 func (repository *TaskRepository) FetchByID(id string) (model.Task, error) {
-	t := Task{}
+	dbTask := Task{}
 
-	result := repository.DB.First(&t, "uuid = ?", id)
+	result := repository.DB.First(&dbTask, "uuid = ?", id)
 
 	if err := result.Error; err != nil {
 		return model.Task{}, err
 	}
 
-	fetched := t.toModel()
+	fetched := dbTask.toModel()
 	return fetched, nil
 }
 
 func (repository *TaskRepository) Create(task model.Task) (model.Task, error) {
-	t := toDBTask(task)
+	dbTask := toDBTask(task)
 	id := strings.ReplaceAll(uuid.NewString(), "-", "") // UUIDの生成（ハイフン除去済み）
-	t.UUID = id                                         // 生成時はUUIDを自動でセット
+	dbTask.UUID = id                                    // 生成時はUUIDを自動でセット
 
-	result := repository.DB.Create(&t)
+	result := repository.DB.Create(&dbTask)
 
 	if err := result.Error; err != nil {
 		return model.Task{}, err
 	}
 
-	created := t.toModel()
+	created := dbTask.toModel()
 	return created, result.Error
 }
 
-func (repository *TaskRepository) Update(task model.Task, needIdentify bool) (model.Task, error) {
-	t := Task{}
-	result := repository.DB.First(&t, "uuid = ?", task.ID)
+func (repository *TaskRepository) Update(task model.Task) (model.Task, error) {
+	dbTask := toDBTask(task)
+
+	// NOTE: UUID以外のフィールドを更新する
+	// 参考: https://gorm.io/docs/update.html
+	result := repository.DB.Model(&Task{}).Where("uuid = ?", dbTask.UUID).Select("*").Omit("UUID").Updates(dbTask)
 
 	if err := result.Error; err != nil {
 		return model.Task{}, err
 	}
 
-	// needIdentify = true の場合は既に登録済みのユーザー以外の更新をエラーにする
-	if needIdentify && t.UserID != task.UserID {
-		err := &model.Error{StatusCode: http.StatusForbidden, Message: "許可されていないタスクの更新です"}
-		return model.Task{}, err
-	}
-
-	// データ更新
-	t.updateFromModel(task)
-
-	result = repository.DB.Save(&t)
-
-	if err := result.Error; err != nil {
-		return model.Task{}, err
-	}
-
-	updated := t.toModel()
+	// NOTE: 更新処理の都合上フィールドの更新が行われないので引数と同じ値を返す
+	updated := dbTask.toModel()
 	return updated, nil
 }
 
-func (repository *TaskRepository) Delete(id string, userID string) error {
-	result := repository.DB.Delete(&Task{}, "uuid = ? AND user_id = ?", id, userID)
+func (repository *TaskRepository) Delete(id string) error {
+	result := repository.DB.Delete(&Task{}, "uuid = ?", id)
 	if result.Error != nil {
 		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
 		return e
