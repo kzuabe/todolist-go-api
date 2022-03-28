@@ -101,6 +101,7 @@ func (controller *TaskController) Post(c *gin.Context) {
 	created, err := controller.UseCase.Create(task)
 	if err != nil {
 		c.Error(err)
+		return
 	}
 
 	c.IndentedJSON(http.StatusCreated, created)
@@ -134,6 +135,7 @@ func (controller *TaskController) Put(c *gin.Context) {
 	updated, err := controller.UseCase.Update(task)
 	if err != nil {
 		c.Error(err)
+		return
 	}
 	c.IndentedJSON(http.StatusCreated, updated)
 }
@@ -148,11 +150,15 @@ func (controller *TaskController) Put(c *gin.Context) {
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [delete]
 func (controller *TaskController) Delete(c *gin.Context) {
-	token, _ := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
+	token := c.MustGet(middleware.CONTEXT_TOKEN_KEY).(*auth.Token)
 
 	id := c.Param("id")
 	userID := token.UID
 
-	_ = controller.UseCase.Delete(id, userID)
+	err := controller.UseCase.Delete(id, userID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
 	c.Status(http.StatusNoContent)
 }
