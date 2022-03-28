@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -46,6 +47,9 @@ func (repository *TaskRepository) FetchByID(id string) (model.Task, error) {
 	result := repository.DB.First(&dbTask, "uuid = ?", id)
 
 	if err := result.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = &model.Error{StatusCode: http.StatusNotFound, Message: "データが存在しません"}
+		}
 		return model.Task{}, err
 	}
 
@@ -75,6 +79,9 @@ func (repository *TaskRepository) Update(task model.Task) (model.Task, error) {
 	result := tx.Select("UserID", "Title", "Description", "Status").Updates(dbTask) // WARNING: カラム追加時はここにフィールド名の追加が必要
 
 	if err := result.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = &model.Error{StatusCode: http.StatusNotFound, Message: "データが存在しません"}
+		}
 		return model.Task{}, err
 	}
 
@@ -85,9 +92,11 @@ func (repository *TaskRepository) Update(task model.Task) (model.Task, error) {
 
 func (repository *TaskRepository) Delete(id string) error {
 	result := repository.DB.Delete(&Task{}, "uuid = ?", id)
-	if result.Error != nil {
-		e := &model.Error{StatusCode: http.StatusInternalServerError, Message: result.Error.Error()}
-		return e
+	if err := result.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = &model.Error{StatusCode: http.StatusNotFound, Message: "データが存在しません"}
+		}
+		return err
 	}
 	return nil
 }
