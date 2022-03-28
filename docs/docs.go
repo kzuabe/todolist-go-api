@@ -40,13 +40,6 @@ var doc = `{
                 "summary": "タスク取得",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "取得するタスクのユーザーID",
-                        "name": "user_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
                         "enum": [
                             0,
                             1
@@ -63,7 +56,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entity.Task"
+                                "$ref": "#/definitions/model.Task"
                             }
                         }
                     }
@@ -93,7 +86,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 ],
@@ -101,7 +94,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 }
@@ -135,7 +128,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 }
@@ -159,12 +152,19 @@ var doc = `{
                 "summary": "タスク更新",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "タスクID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Payload Description",
                         "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 ],
@@ -172,7 +172,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 }
@@ -204,7 +204,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 }
@@ -212,21 +212,23 @@ var doc = `{
         }
     },
     "definitions": {
-        "entity.Task": {
+        "model.Task": {
             "type": "object",
             "properties": {
                 "description": {
+                    "description": "タスク説明文",
                     "type": "string"
                 },
                 "id": {
-                    "description": "UUID",
+                    "description": "タスクID（自動で生成されるUUID）",
                     "type": "string"
                 },
                 "status": {
-                    "description": "0: 未着手, 1: 完了",
+                    "description": "タスクのステータス（0: 未着手, 1: 完了）",
                     "type": "integer"
                 },
                 "title": {
+                    "description": "タスクタイトル",
                     "type": "string"
                 },
                 "user_id": {
