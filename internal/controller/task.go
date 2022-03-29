@@ -62,9 +62,9 @@ func (controller *TaskController) Get(c *gin.Context) {
 // @Produce      json
 // @Param        id   path  string  true  "タスクID"
 // @Success      200      {object}  model.Task
-// @Failure      401  "Unauthorized"
-// @Failure      403  {object}  model.Error
-// @Failure      404  {object}  model.Error
+// @Failure      401      "Unauthorized"
+// @Failure      403      {object}  model.Error
+// @Failure      404      {object}  model.Error
 // @Failure      500      {object}  model.Error
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [get]
@@ -92,7 +92,7 @@ func (controller *TaskController) GetByID(c *gin.Context) {
 // @Param        payload  body      model.Task  true  "登録タスク内容（id / user_idの値は自動セット）"
 // @Success      201      {object}  model.Task
 // @Failure      401      "Unauthorized"
-// @Failure      500  {object}  model.Error
+// @Failure      500      {object}  model.Error
 // @Security     TokenAuth
 // @Router       /v1/tasks [post]
 func (controller *TaskController) Post(c *gin.Context) {

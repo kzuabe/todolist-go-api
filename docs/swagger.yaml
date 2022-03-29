@@ -1,4 +1,10 @@
 definitions:
+  model.Error:
+    properties:
+      message:
+        description: エラーメッセージ
+        type: string
+    type: object
   model.Task:
     properties:
       description:
@@ -48,6 +54,12 @@ paths:
             items:
               $ref: '#/definitions/model.Task'
             type: array
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
       security:
       - TokenAuth: []
       summary: タスク取得
@@ -71,6 +83,12 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/model.Task'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
       security:
       - TokenAuth: []
       summary: タスク追加
@@ -88,6 +106,20 @@ paths:
       responses:
         "204":
           description: No Content
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
       security:
       - TokenAuth: []
       summary: タスク削除
@@ -108,6 +140,20 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Task'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
       security:
       - TokenAuth: []
       summary: タスク取得（1件）
@@ -136,6 +182,20 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Task'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
       security:
       - TokenAuth: []
       summary: タスク更新
