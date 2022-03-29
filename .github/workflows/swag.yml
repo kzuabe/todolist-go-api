@@ -38,4 +38,4 @@ jobs:
         commit-message: 'docs(auto): automated update swagger docs'
         title: '[Auto] Update Swagger Docs'
         body: |
-          Update swagger docs from ${GITHUB_SHA}
+          Update swagger docs from $GITHUB_SHA
