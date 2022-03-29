@@ -9,7 +9,7 @@ require (
 	github.com/google/wire v0.5.0
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.8.0
-	gorm.io/driver/mysql v1.2.1
+	gorm.io/driver/mysql v1.3.2
 	gorm.io/gorm v1.23.3
 )
 
