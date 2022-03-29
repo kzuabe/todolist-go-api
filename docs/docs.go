@@ -215,25 +215,30 @@ var doc = `{
         "model.Task": {
             "type": "object",
             "properties": {
-                "description": {
-                    "description": "タスク説明文",
-                    "type": "string"
-                },
                 "id": {
                     "description": "タスクID（自動で生成されるUUID）",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "タスクのステータス（0: 未着手, 1: 完了）",
-                    "type": "integer"
-                },
-                "title": {
-                    "description": "タスクタイトル",
-                    "type": "string"
+                    "type": "string",
+                    "x-order": "0"
                 },
                 "user_id": {
                     "description": "ユーザID",
-                    "type": "string"
+                    "type": "string",
+                    "x-order": "1"
+                },
+                "title": {
+                    "description": "タスクタイトル",
+                    "type": "string",
+                    "x-order": "2"
+                },
+                "description": {
+                    "description": "タスク説明文",
+                    "type": "string",
+                    "x-order": "3"
+                },
+                "status": {
+                    "description": "タスクのステータス（0: 未着手, 1: 完了）",
+                    "type": "integer",
+                    "x-order": "4"
                 }
             }
         }
