@@ -9,22 +9,19 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
-type Handler struct {
-	TaskController         controller.TaskControllerInterface
-	FirebaseAuthMiddleware middleware.FirebaseAuthMiddlewareInterface
-}
-
-func NewRouter(h Handler) *gin.Engine {
+func NewRouter(tc *controller.TaskController, fc middleware.Client) *gin.Engine {
 	router := gin.Default()
 
+	router.Use(ErrorHandler())
+
 	v1 := router.Group("/v1")
-	v1.Use(h.FirebaseAuthMiddleware.MiddlewareFunc())
+	v1.Use(middleware.NewAuthorizer(fc))
 	{
-		v1.GET("/tasks", h.TaskController.Get)
-		v1.GET("tasks/:id", h.TaskController.GetByID)
-		v1.POST("/tasks", h.TaskController.Post)
-		v1.PUT("/tasks/:id", h.TaskController.Put)
-		v1.DELETE("/tasks/:id", h.TaskController.Delete)
+		v1.GET("/tasks", tc.Get)
+		v1.GET("tasks/:id", tc.GetByID)
+		v1.POST("/tasks", tc.Post)
+		v1.PUT("/tasks/:id", tc.Put)
+		v1.DELETE("/tasks/:id", tc.Delete)
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

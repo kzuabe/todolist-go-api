@@ -1,16 +1,26 @@
 definitions:
-  entity.Task:
+  model.Task:
     properties:
       description:
+        description: タスク説明文
         type: string
+        x-order: "3"
       id:
-        description: UUID
+        description: タスクID（自動で生成されるUUID）
         type: string
+        x-order: "0"
       status:
-        description: '0: 未着手, 1: 完了'
+        description: 'タスクのステータス（0: 未着手, 1: 完了）'
         type: integer
+        x-order: "4"
       title:
+        description: タスクタイトル
         type: string
+        x-order: "2"
+      user_id:
+        description: ユーザID
+        type: string
+        x-order: "1"
     type: object
 info:
   contact: {}
@@ -36,7 +46,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/entity.Task'
+              $ref: '#/definitions/model.Task'
             type: array
       security:
       - TokenAuth: []
@@ -48,19 +58,19 @@ paths:
       - application/json
       description: ユーザのタスクを追加する
       parameters:
-      - description: Payload Description
+      - description: 登録タスク内容（id / user_idの値は自動セット）
         in: body
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/entity.Task'
+          $ref: '#/definitions/model.Task'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            $ref: '#/definitions/entity.Task'
+            $ref: '#/definitions/model.Task'
       security:
       - TokenAuth: []
       summary: タスク追加
@@ -75,13 +85,9 @@ paths:
         name: id
         required: true
         type: string
-      produces:
-      - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Task'
+        "204":
+          description: No Content
       security:
       - TokenAuth: []
       summary: タスク削除
@@ -101,7 +107,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Task'
+            $ref: '#/definitions/model.Task'
       security:
       - TokenAuth: []
       summary: タスク取得（1件）
@@ -112,19 +118,24 @@ paths:
       - application/json
       description: ユーザのタスクを更新する
       parameters:
-      - description: Payload Description
+      - description: タスクID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 登録タスク内容（id / user_idの値は自動セット）
         in: body
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/entity.Task'
+          $ref: '#/definitions/model.Task'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Task'
+            $ref: '#/definitions/model.Task'
       security:
       - TokenAuth: []
       summary: タスク更新

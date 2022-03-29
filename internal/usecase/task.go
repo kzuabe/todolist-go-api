@@ -1,43 +1,85 @@
 package usecase
 
 import (
-	"strings"
+	"net/http"
 
-	"github.com/google/uuid"
-	"github.com/kzuabe/todolist-go-api/internal/entity"
-	"github.com/kzuabe/todolist-go-api/internal/repository"
+	"github.com/kzuabe/todolist-go-api/internal/model"
 )
 
+type TaskRepositoryInterface interface {
+	Fetch(model.TaskFetchParam) ([]model.Task, error)
+	FetchByID(string) (model.Task, error)
+	Create(model.Task) (model.Task, error)
+	Update(model.Task) (model.Task, error)
+	Delete(string) error
+}
+
 type TaskUseCase struct {
-	Repository repository.TaskRepositoryInterface
+	Repository TaskRepositoryInterface
 }
 
-type TaskUseCaseInterface interface {
-	Fetch(entity.TaskFetchParam) ([]entity.Task, error)
-	FetchByID(string, string) (entity.Task, error)
-	Create(entity.Task) (entity.Task, error)
-	Update(entity.Task) (entity.Task, error)
-	Delete(string, string) error
+func NewTaskUseCase(repository TaskRepositoryInterface) *TaskUseCase {
+	return &TaskUseCase{Repository: repository}
 }
 
-func (useCase *TaskUseCase) Fetch(params entity.TaskFetchParam) ([]entity.Task, error) {
+func (useCase *TaskUseCase) Fetch(params model.TaskFetchParam) ([]model.Task, error) {
+	if params.UserID == "" { // ユーザーIDの指定必須
+		err := &model.Error{StatusCode: http.StatusInternalServerError, Message: "ユーザー情報が取得できませんでした"}
+		return []model.Task{}, err
+	}
+
 	return useCase.Repository.Fetch(params)
 }
 
-func (useCae *TaskUseCase) FetchByID(id string, userID string) (entity.Task, error) {
-	return useCae.Repository.FetchByID(id, userID)
+func (useCae *TaskUseCase) FetchByID(id string, userID string) (model.Task, error) {
+	task, err := useCae.Repository.FetchByID(id)
+	if err != nil {
+		return model.Task{}, err
+	}
+
+	// ユーザーの検証
+	if err := verifyUser(task, userID); err != nil {
+		return model.Task{}, err
+	}
+
+	return task, nil
 }
 
-func (useCase *TaskUseCase) Create(task entity.Task) (entity.Task, error) {
-	uuid := strings.ReplaceAll(uuid.NewString(), "-", "") // UUIDの生成（ハイフン除去済み）
-	task.ID = uuid
+func (useCase *TaskUseCase) Create(task model.Task) (model.Task, error) {
 	return useCase.Repository.Create(task)
 }
 
-func (useCase *TaskUseCase) Update(task entity.Task) (entity.Task, error) {
+func (useCase *TaskUseCase) Update(task model.Task) (model.Task, error) {
+	// ユーザーの検証
+	registered, err := useCase.Repository.FetchByID(task.ID)
+	if err != nil {
+		return model.Task{}, err
+	}
+	if err = verifyUser(registered, task.UserID); err != nil {
+		return model.Task{}, err
+	}
+
 	return useCase.Repository.Update(task)
 }
 
 func (useCase *TaskUseCase) Delete(id string, userID string) error {
-	return useCase.Repository.Delete(id, userID)
+	// ユーザーの検証
+	registered, err := useCase.Repository.FetchByID(id)
+	if err != nil {
+		return err
+	}
+	if err := verifyUser(registered, userID); err != nil {
+		return err
+	}
+
+	return useCase.Repository.Delete(id)
+}
+
+// ユーザーIDをもとにタスクの権限があるかを検証する（権限が無い場合はエラーを返す）
+func verifyUser(task model.Task, userID string) error {
+	if task.UserID != userID {
+		err := &model.Error{StatusCode: http.StatusForbidden, Message: "許可されていないユーザーからのリクエストです"}
+		return err
+	}
+	return nil
 }

@@ -56,7 +56,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entity.Task"
+                                "$ref": "#/definitions/model.Task"
                             }
                         }
                     }
@@ -81,20 +81,20 @@ var doc = `{
                 "summary": "タスク追加",
                 "parameters": [
                     {
-                        "description": "Payload Description",
+                        "description": "登録タスク内容（id / user_idの値は自動セット）",
                         "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 }
@@ -128,7 +128,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 }
@@ -152,12 +152,19 @@ var doc = `{
                 "summary": "タスク更新",
                 "parameters": [
                     {
-                        "description": "Payload Description",
+                        "type": "string",
+                        "description": "タスクID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "登録タスク内容（id / user_idの値は自動セット）",
                         "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 ],
@@ -165,7 +172,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 }
@@ -177,9 +184,6 @@ var doc = `{
                     }
                 ],
                 "description": "ユーザのタスクを削除する",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "task"
                 ],
@@ -194,33 +198,41 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.Task"
-                        }
+                    "204": {
+                        "description": "No Content"
                     }
                 }
             }
         }
     },
     "definitions": {
-        "entity.Task": {
+        "model.Task": {
             "type": "object",
             "properties": {
-                "description": {
-                    "type": "string"
-                },
                 "id": {
-                    "description": "UUID",
-                    "type": "string"
+                    "description": "タスクID（自動で生成されるUUID）",
+                    "type": "string",
+                    "x-order": "0"
                 },
-                "status": {
-                    "description": "0: 未着手, 1: 完了",
-                    "type": "integer"
+                "user_id": {
+                    "description": "ユーザID",
+                    "type": "string",
+                    "x-order": "1"
                 },
                 "title": {
-                    "type": "string"
+                    "description": "タスクタイトル",
+                    "type": "string",
+                    "x-order": "2"
+                },
+                "description": {
+                    "description": "タスク説明文",
+                    "type": "string",
+                    "x-order": "3"
+                },
+                "status": {
+                    "description": "タスクのステータス（0: 未着手, 1: 完了）",
+                    "type": "integer",
+                    "x-order": "4"
                 }
             }
         }

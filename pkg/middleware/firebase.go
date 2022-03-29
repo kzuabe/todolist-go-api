@@ -5,36 +5,41 @@ import (
 	"net/http"
 	"strings"
 
+	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
 )
 
-const CONTEXT_TOKEN_KEY = "token"
+const AuthTokenKey = "token"
 
-type FirebaseAuthMiddleware struct {
-	Client *auth.Client
+type Client *auth.Client
+
+func NewClient() (Client, error) {
+	app, err := firebase.NewApp(context.Background(), nil)
+	if err != nil {
+		return nil, err
+	}
+	client, err := app.Auth(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
-type FirebaseAuthMiddlewareInterface interface {
-	MiddlewareFunc() gin.HandlerFunc
-}
-
-func (middleware *FirebaseAuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
+func NewAuthorizer(client *auth.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idToken, ok := extractTokenFromAuthHeader(c.Request.Header.Get("Authorization"))
 		if !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "need token"})
-			c.Abort()
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
-		token, err := middleware.Client.VerifyIDToken(context.Background(), idToken)
+		token, err := client.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "invalid token"})
-			c.Abort()
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		c.Set(CONTEXT_TOKEN_KEY, token)
+		c.Set(AuthTokenKey, token)
 		c.Next()
 	}
 }
