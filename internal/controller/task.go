@@ -137,7 +137,7 @@ func (controller *TaskController) Put(c *gin.Context) {
 		c.Error(err)
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, updated)
+	c.IndentedJSON(http.StatusOK, updated)
 }
 
 // Delete godoc
