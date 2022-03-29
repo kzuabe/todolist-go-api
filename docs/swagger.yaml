@@ -58,7 +58,7 @@ paths:
       - application/json
       description: ユーザのタスクを追加する
       parameters:
-      - description: Payload Description
+      - description: 登録タスク内容（id / user_idの値は自動セット）
         in: body
         name: payload
         required: true
@@ -67,8 +67,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/model.Task'
       security:
@@ -85,13 +85,9 @@ paths:
         name: id
         required: true
         type: string
-      produces:
-      - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Task'
+        "204":
+          description: No Content
       security:
       - TokenAuth: []
       summary: タスク削除
@@ -127,7 +123,7 @@ paths:
         name: id
         required: true
         type: string
-      - description: Payload Description
+      - description: 登録タスク内容（id / user_idの値は自動セット）
         in: body
         name: payload
         required: true

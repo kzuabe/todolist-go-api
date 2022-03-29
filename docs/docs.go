@@ -81,7 +81,7 @@ var doc = `{
                 "summary": "タスク追加",
                 "parameters": [
                     {
-                        "description": "Payload Description",
+                        "description": "登録タスク内容（id / user_idの値は自動セット）",
                         "name": "payload",
                         "in": "body",
                         "required": true,
@@ -91,8 +91,8 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/model.Task"
                         }
@@ -159,7 +159,7 @@ var doc = `{
                         "required": true
                     },
                     {
-                        "description": "Payload Description",
+                        "description": "登録タスク内容（id / user_idの値は自動セット）",
                         "name": "payload",
                         "in": "body",
                         "required": true,
@@ -184,9 +184,6 @@ var doc = `{
                     }
                 ],
                 "description": "ユーザのタスクを削除する",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "task"
                 ],
@@ -201,11 +198,8 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Task"
-                        }
+                    "204": {
+                        "description": "No Content"
                     }
                 }
             }

@@ -58,7 +58,7 @@ func (controller *TaskController) Get(c *gin.Context) {
 // @Description  ユーザのタスクを1件取得する
 // @Tags         task
 // @Produce      json
-// @Param        id       path      string      true  "タスクID"
+// @Param        id   path  string  true  "タスクID"
 // @Success      200      {object}  model.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [get]
@@ -83,8 +83,8 @@ func (controller *TaskController) GetByID(c *gin.Context) {
 // @Tags         task
 // @Accept       json
 // @Produce      json
-// @Param        payload  body      model.Task  true  "Payload Description"
-// @Success      200      {object}  model.Task
+// @Param        payload  body      model.Task  true  "登録タスク内容（id / user_idの値は自動セット）"
+// @Success      201      {object}  model.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks [post]
 func (controller *TaskController) Post(c *gin.Context) {
@@ -113,8 +113,8 @@ func (controller *TaskController) Post(c *gin.Context) {
 // @Tags         task
 // @Accept       json
 // @Produce      json
-// @Param        id   path      string  true  "タスクID"
-// @Param        payload  body      model.Task  true  "Payload Description"
+// @Param        id       path      string      true  "タスクID"
+// @Param        payload  body      model.Task  true  "登録タスク内容（id / user_idの値は自動セット）"
 // @Success      200  {object}  model.Task
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [put]
@@ -144,9 +144,8 @@ func (controller *TaskController) Put(c *gin.Context) {
 // @Summary      タスク削除
 // @Description  ユーザのタスクを削除する
 // @Tags         task
-// @Produce      json
 // @Param        id   path      string  true  "タスクID"
-// @Success      200  {object}  model.Task
+// @Success      204  "No Content"
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [delete]
 func (controller *TaskController) Delete(c *gin.Context) {
