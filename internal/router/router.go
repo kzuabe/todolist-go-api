@@ -9,13 +9,13 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
-func NewRouter(tc *controller.TaskController, fam *middleware.FirebaseAuthMiddleware) *gin.Engine {
+func NewRouter(tc *controller.TaskController, fc middleware.Client) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(ErrorHandler())
 
 	v1 := router.Group("/v1")
-	v1.Use(fam.MiddlewareFunc())
+	v1.Use(middleware.NewAuthorizer(fc))
 	{
 		v1.GET("/tasks", tc.Get)
 		v1.GET("tasks/:id", tc.GetByID)

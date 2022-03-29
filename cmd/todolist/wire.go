@@ -20,7 +20,7 @@ func initializeRouter() (*gin.Engine, error) {
 		usecase.NewTaskUseCase,
 		repository.NewTaskRepository,
 		repository.NewDB,
-		middleware.NewFirebaseAuthMiddleware,
+		middleware.NewClient,
 
 		wire.Bind(new(usecase.TaskRepositoryInterface), new(*repository.TaskRepository)),
 		wire.Bind(new(controller.TaskUseCaseInterface), new(*usecase.TaskUseCase)),

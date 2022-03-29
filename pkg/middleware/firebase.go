@@ -10,14 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const CONTEXT_TOKEN_KEY = "token"
+const AuthTokenKey = "token"
 
-type FirebaseAuthMiddleware struct {
-	Client *auth.Client
-}
+type Client *auth.Client
 
-// FirebaseAdminの初期化（Clientのセットアップ）
-func NewFirebaseAuthMiddleware() (*FirebaseAuthMiddleware, error) {
+func NewClient() (Client, error) {
 	app, err := firebase.NewApp(context.Background(), nil)
 	if err != nil {
 		return nil, err
@@ -26,10 +23,10 @@ func NewFirebaseAuthMiddleware() (*FirebaseAuthMiddleware, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &FirebaseAuthMiddleware{Client: client}, nil
+	return client, nil
 }
 
-func (middleware *FirebaseAuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
+func NewAuthorizer(client *auth.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idToken, ok := extractTokenFromAuthHeader(c.Request.Header.Get("Authorization"))
 		if !ok {
@@ -37,12 +34,12 @@ func (middleware *FirebaseAuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 			return
 		}
 
-		token, err := middleware.Client.VerifyIDToken(context.Background(), idToken)
+		token, err := client.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		c.Set(CONTEXT_TOKEN_KEY, token)
+		c.Set(AuthTokenKey, token)
 		c.Next()
 	}
 }

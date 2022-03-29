@@ -25,10 +25,10 @@ func initializeRouter() (*gin.Engine, error) {
 	taskRepository := repository.NewTaskRepository(db)
 	taskUseCase := usecase.NewTaskUseCase(taskRepository)
 	taskController := controller.NewTaskController(taskUseCase)
-	firebaseAuthMiddleware, err := middleware.NewFirebaseAuthMiddleware()
+	client, err := middleware.NewClient()
 	if err != nil {
 		return nil, err
 	}
-	engine := router.NewRouter(taskController, firebaseAuthMiddleware)
+	engine := router.NewRouter(taskController, client)
 	return engine, nil
 }
