@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kzuabe/todolist-go-api/internal/config"
+	"github.com/kzuabe/todolist-go-api/app/config"
 )
 
 // @title                       TodoList API

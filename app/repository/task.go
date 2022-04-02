@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/kzuabe/todolist-go-api/internal/model"
+	"github.com/kzuabe/todolist-go-api/app/model"
 	"gorm.io/gorm"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
-	"github.com/kzuabe/todolist-go-api/internal/model"
+	"github.com/kzuabe/todolist-go-api/app/model"
 	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 )
 

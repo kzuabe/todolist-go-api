@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/kzuabe/todolist-go-api/internal/config"
+	"github.com/kzuabe/todolist-go-api/app/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

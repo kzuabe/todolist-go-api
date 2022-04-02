@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kzuabe/todolist-go-api/internal/model"
+	"github.com/kzuabe/todolist-go-api/app/model"
 )
 
 func ErrorHandler() gin.HandlerFunc {

@@ -2,8 +2,8 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/kzuabe/todolist-go-api/app/controller"
 	_ "github.com/kzuabe/todolist-go-api/docs"
-	"github.com/kzuabe/todolist-go-api/internal/controller"
 	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
