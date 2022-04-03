@@ -8,7 +8,7 @@ import (
 	"github.com/kzuabe/todolist-go-api/app/model"
 )
 
-type TaskUseCaseInterface interface {
+type taskUseCase interface {
 	Fetch(model.TaskFetchParam) ([]model.Task, error)
 	FetchByID(string, string) (model.Task, error)
 	Create(model.Task) (model.Task, error)
@@ -17,10 +17,10 @@ type TaskUseCaseInterface interface {
 }
 
 type TaskController struct {
-	UseCase TaskUseCaseInterface
+	UseCase taskUseCase
 }
 
-func NewTaskController(useCase TaskUseCaseInterface) *TaskController {
+func NewTaskController(useCase taskUseCase) *TaskController {
 	return &TaskController{UseCase: useCase}
 }
 

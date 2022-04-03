@@ -10,10 +10,6 @@ build:
 test:
 	go test ./...
 
-.PHONY: wire
-wire:
-	wire ./cmd/todolist
-
 .PHONY: swag
 swag:
 	swag fmt -g ./cmd/todolist/main.go

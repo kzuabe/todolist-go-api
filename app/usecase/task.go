@@ -6,7 +6,7 @@ import (
 	"github.com/kzuabe/todolist-go-api/app/model"
 )
 
-type TaskRepositoryInterface interface {
+type taskRepository interface {
 	Fetch(model.TaskFetchParam) ([]model.Task, error)
 	FetchByID(string) (model.Task, error)
 	Create(model.Task) (model.Task, error)
@@ -15,10 +15,10 @@ type TaskRepositoryInterface interface {
 }
 
 type TaskUseCase struct {
-	Repository TaskRepositoryInterface
+	Repository taskRepository
 }
 
-func NewTaskUseCase(repository TaskRepositoryInterface) *TaskUseCase {
+func NewTaskUseCase(repository taskRepository) *TaskUseCase {
 	return &TaskUseCase{Repository: repository}
 }
 
