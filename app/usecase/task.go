@@ -3,7 +3,7 @@ package usecase
 import (
 	"net/http"
 
-	"github.com/kzuabe/todolist-go-api/internal/model"
+	"github.com/kzuabe/todolist-go-api/app/model"
 )
 
 type TaskRepositoryInterface interface {

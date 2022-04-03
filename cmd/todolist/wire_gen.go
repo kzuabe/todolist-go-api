@@ -8,11 +8,10 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/kzuabe/todolist-go-api/internal/controller"
-	"github.com/kzuabe/todolist-go-api/internal/repository"
-	"github.com/kzuabe/todolist-go-api/internal/router"
-	"github.com/kzuabe/todolist-go-api/internal/usecase"
-	"github.com/kzuabe/todolist-go-api/pkg/middleware"
+	"github.com/kzuabe/todolist-go-api/app/controller"
+	"github.com/kzuabe/todolist-go-api/app/repository"
+	"github.com/kzuabe/todolist-go-api/app/router"
+	"github.com/kzuabe/todolist-go-api/app/usecase"
 )
 
 // Injectors from wire.go:
@@ -25,10 +24,6 @@ func initializeRouter() (*gin.Engine, error) {
 	taskRepository := repository.NewTaskRepository(db)
 	taskUseCase := usecase.NewTaskUseCase(taskRepository)
 	taskController := controller.NewTaskController(taskUseCase)
-	client, err := middleware.NewClient()
-	if err != nil {
-		return nil, err
-	}
-	engine := router.NewRouter(taskController, client)
+	engine := router.NewRouter(taskController)
 	return engine, nil
 }
