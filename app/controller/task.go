@@ -3,10 +3,9 @@ package controller
 import (
 	"net/http"
 
-	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
+	"github.com/kzuabe/ginauth"
 	"github.com/kzuabe/todolist-go-api/app/model"
-	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 )
 
 type TaskUseCaseInterface interface {
@@ -37,7 +36,7 @@ func NewTaskController(useCase TaskUseCaseInterface) *TaskController {
 // @Security     TokenAuth
 // @Router       /v1/tasks [get]
 func (controller *TaskController) Get(c *gin.Context) {
-	token := c.MustGet(middleware.AuthTokenKey).(*auth.Token)
+	token := c.MustGet(ginauth.FirebaseAuthTokenKey).(ginauth.FirebaseAuthToken)
 
 	params := model.TaskFetchParam{}
 	if err := c.ShouldBindQuery(&params); err != nil {
@@ -69,7 +68,7 @@ func (controller *TaskController) Get(c *gin.Context) {
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [get]
 func (controller *TaskController) GetByID(c *gin.Context) {
-	token := c.MustGet(middleware.AuthTokenKey).(*auth.Token)
+	token := c.MustGet(ginauth.FirebaseAuthTokenKey).(ginauth.FirebaseAuthToken)
 
 	id := c.Param("id")
 	userID := token.UID
@@ -96,7 +95,7 @@ func (controller *TaskController) GetByID(c *gin.Context) {
 // @Security     TokenAuth
 // @Router       /v1/tasks [post]
 func (controller *TaskController) Post(c *gin.Context) {
-	token := c.MustGet(middleware.AuthTokenKey).(*auth.Token)
+	token := c.MustGet(ginauth.FirebaseAuthTokenKey).(ginauth.FirebaseAuthToken)
 
 	task := model.Task{}
 	if err := c.ShouldBindJSON(&task); err != nil {
@@ -131,7 +130,7 @@ func (controller *TaskController) Post(c *gin.Context) {
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [put]
 func (controller *TaskController) Put(c *gin.Context) {
-	token, _ := c.MustGet(middleware.AuthTokenKey).(*auth.Token)
+	token, _ := c.MustGet(ginauth.FirebaseAuthTokenKey).(ginauth.FirebaseAuthToken)
 
 	task := model.Task{}
 	if err := c.ShouldBindJSON(&task); err != nil {
@@ -165,7 +164,7 @@ func (controller *TaskController) Put(c *gin.Context) {
 // @Security     TokenAuth
 // @Router       /v1/tasks/{id} [delete]
 func (controller *TaskController) Delete(c *gin.Context) {
-	token := c.MustGet(middleware.AuthTokenKey).(*auth.Token)
+	token := c.MustGet(ginauth.FirebaseAuthTokenKey).(ginauth.FirebaseAuthToken)
 
 	id := c.Param("id")
 	userID := token.UID

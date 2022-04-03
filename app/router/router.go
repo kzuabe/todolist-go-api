@@ -2,20 +2,22 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/kzuabe/ginauth"
 	"github.com/kzuabe/todolist-go-api/app/controller"
 	_ "github.com/kzuabe/todolist-go-api/docs"
-	"github.com/kzuabe/todolist-go-api/pkg/middleware"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
-func NewRouter(tc *controller.TaskController, fc middleware.Client) *gin.Engine {
+func NewRouter(tc *controller.TaskController) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(ErrorHandler())
 
 	v1 := router.Group("/v1")
-	v1.Use(middleware.NewAuthorizer(fc))
+
+	provider := ginauth.NewFirebaseAuthProvider()
+	v1.Use(ginauth.NewAuthorizer(provider))
 	{
 		v1.GET("/tasks", tc.Get)
 		v1.GET("tasks/:id", tc.GetByID)
