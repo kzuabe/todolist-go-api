@@ -12,7 +12,7 @@ import (
 func NewRouter(tc *controller.TaskController) *gin.Engine {
 	router := gin.Default()
 
-	router.Use(ErrorHandler())
+	router.Use(controller.ErrorHandler())
 
 	v1 := router.Group("/v1")
 
