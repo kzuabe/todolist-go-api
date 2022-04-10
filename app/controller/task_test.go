@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/kzuabe/ginauth"
 	"github.com/kzuabe/todolist-go-api/app/model"
@@ -13,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestTaskRouter(controller *TaskController, token ginauth.FirebaseAuthToken) *gin.Engine {
+func newTestTaskRouter(controller *TaskController, token *auth.Token) *gin.Engine {
 	r := gin.Default()
 	r.Use(func(c *gin.Context) {
 		c.Set(ginauth.FirebaseAuthTokenKey, token)
@@ -29,9 +30,9 @@ func newTestTaskRouter(controller *TaskController, token ginauth.FirebaseAuthTok
 func TestTaskController_Get(t *testing.T) {
 	type args struct {
 		r     *http.Request
-		token ginauth.FirebaseAuthToken
+		token *auth.Token
 	}
-	type expects struct {
+	type mock struct {
 		argParam model.TaskFetchParam
 		tasks    []model.Task
 		err      error
@@ -41,17 +42,23 @@ func TestTaskController_Get(t *testing.T) {
 		body string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		expects expects
-		want    want
+		name string
+		args args
+		mock mock
+		want want
 	}{
 		{
 			name: "リクエストに対して正常なレスポンスを返す",
 			args: args{
 				r: httptest.NewRequest("GET", "/", nil),
+				token: &auth.Token{
+					UID: "testuserid1",
+				},
 			},
-			expects: expects{
+			mock: mock{
+				argParam: model.TaskFetchParam{
+					UserID: "testuserid1",
+				},
 				tasks: []model.Task{
 					{
 						ID:          "testtaskid1",
@@ -72,7 +79,7 @@ func TestTaskController_Get(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// ルーターのセットアップ
 			useCase := new(mocks.TaskUseCaseInterface)
-			useCase.On("Fetch", tt.expects.argParam).Return(tt.expects.tasks, tt.expects.err)
+			useCase.On("Fetch", tt.mock.argParam).Return(tt.mock.tasks, tt.mock.err)
 			controller := NewTaskController(useCase)
 			router := newTestTaskRouter(controller, tt.args.token)
 
@@ -84,7 +91,7 @@ func TestTaskController_Get(t *testing.T) {
 			if err != nil {
 				t.Errorf("Body File not found: %v", tt.want.body)
 			}
-			assert.Equal(t, wantBody, w.Body.String())
+			assert.Equal(t, string(wantBody), w.Body.String())
 		})
 	}
 }
