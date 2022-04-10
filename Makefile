@@ -10,6 +10,10 @@ build:
 test:
 	go test ./...
 
+.PHONY: mock
+mock:
+	mockery --all --keeptree --output=test/mocks
+
 .PHONY: swag
 swag:
 	swag fmt -g ./cmd/todolist/main.go
