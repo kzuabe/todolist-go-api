@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"bytes"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -19,6 +21,7 @@ func newTestTaskRouter(controller *TaskController, token *auth.Token) *gin.Engin
 	r.Use(func(c *gin.Context) {
 		c.Set(ginauth.FirebaseAuthTokenKey, token)
 	})
+	r.Use(ErrorHandler())
 	r.GET("/", controller.Get)
 	r.GET("/:id", controller.GetByID)
 	r.POST("/", controller.Post)
@@ -29,8 +32,10 @@ func newTestTaskRouter(controller *TaskController, token *auth.Token) *gin.Engin
 
 func TestTaskController(t *testing.T) {
 	type args struct {
-		r     *http.Request
-		token *auth.Token
+		method string
+		target string
+		body   string
+		token  *auth.Token
 	}
 	type mock struct {
 		funcName   string
@@ -50,7 +55,8 @@ func TestTaskController(t *testing.T) {
 		{
 			name: "リクエストに対して正常なレスポンスを返す",
 			args: args{
-				r: httptest.NewRequest("GET", "/", nil),
+				method: http.MethodGet,
+				target: "/",
 				token: &auth.Token{
 					UID: "testuserid1",
 				},
@@ -91,13 +97,26 @@ func TestTaskController(t *testing.T) {
 			controller := NewTaskController(useCase)
 			router := newTestTaskRouter(controller, tt.args.token)
 
-			w := httptest.NewRecorder()
-			router.ServeHTTP(w, tt.args.r)
+			// リクエストの作成
+			var reqBody io.Reader
+			if body := tt.args.body; body != "" {
+				b, err := ioutil.ReadFile(body)
+				if err != nil {
+					t.Errorf("Request Body File not found: %v", tt.want.body)
+				}
+				reqBody = bytes.NewBuffer(b)
+			}
+			r := httptest.NewRequest(tt.args.method, tt.args.target, reqBody)
 
+			// リクエスト実行
+			w := httptest.NewRecorder()
+			router.ServeHTTP(w, r)
+
+			// テスト実行
 			assert.Equal(t, tt.want.code, w.Code)
 			wantBody, err := ioutil.ReadFile(tt.want.body)
 			if err != nil {
-				t.Errorf("Body File not found: %v", tt.want.body)
+				t.Errorf("Response Body File not found: %v", tt.want.body)
 			}
 			assert.Equal(t, string(wantBody), w.Body.String())
 		})
