@@ -84,7 +84,7 @@ func TestTaskController(t *testing.T) {
 			},
 			want: want{
 				code: 200,
-				body: "../../test/testdata/res_get_tasks.json",
+				body: "../../test/testdata/res_tasks.json",
 			},
 		},
 		{
@@ -117,11 +117,11 @@ func TestTaskController(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// ルーターのセットアップ
-			useCase := new(mocks.TaskUseCaseInterface)
+			mockUseCase := new(mocks.TaskUseCaseInterface)
 			for _, mock := range tt.mocks {
-				useCase.On(mock.funcName, mock.args...).Return(mock.returnArgs...)
+				mockUseCase.On(mock.funcName, mock.args...).Return(mock.returnArgs...)
 			}
-			controller := NewTaskController(useCase)
+			controller := NewTaskController(mockUseCase)
 			router := newTestTaskRouter(controller, tt.args.token)
 
 			// リクエストの作成
@@ -146,6 +146,7 @@ func TestTaskController(t *testing.T) {
 				t.Errorf("Response Body File not found: %v", tt.want.body)
 			}
 			assert.Equal(t, string(wantBody), w.Body.String())
+			mockUseCase.AssertExpectations(t)
 		})
 	}
 }
