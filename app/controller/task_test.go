@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -53,7 +54,7 @@ func TestTaskController(t *testing.T) {
 		want  want
 	}{
 		{
-			name: "リクエストに対して正常なレスポンスを返す",
+			name: "Get: リクエストに対して正常なレスポンスを返す",
 			args: args{
 				method: http.MethodGet,
 				target: "/",
@@ -84,6 +85,32 @@ func TestTaskController(t *testing.T) {
 			want: want{
 				code: 200,
 				body: "../../test/testdata/res_get_tasks.json",
+			},
+		},
+		{
+			name: "Get: リクエストに対してエラーレスポンスを返す",
+			args: args{
+				method: http.MethodGet,
+				target: "/",
+				token: &auth.Token{
+					UID: "testuserid1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName: "Fetch",
+					args: []any{
+						model.TaskFetchParam{UserID: "testuserid1"},
+					},
+					returnArgs: []any{
+						[]model.Task{},
+						errors.New("テストエラーメッセージ"),
+					},
+				},
+			},
+			want: want{
+				code: 500,
+				body: "../../test/testdata/res_error.json",
 			},
 		},
 	}
