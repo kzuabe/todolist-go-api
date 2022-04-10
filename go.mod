@@ -3,9 +3,10 @@ module github.com/kzuabe/todolist-go-api
 go 1.18
 
 require (
+	firebase.google.com/go v3.13.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
 	github.com/google/uuid v1.3.0
-	github.com/kzuabe/ginauth v1.0.0
+	github.com/kzuabe/ginauth v1.0.1
 	github.com/stretchr/testify v1.7.1
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.8.0
@@ -19,7 +20,6 @@ require (
 	cloud.google.com/go/firestore v1.6.1 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
 	cloud.google.com/go/storage v1.18.2 // indirect
-	firebase.google.com/go v3.13.0+incompatible // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
