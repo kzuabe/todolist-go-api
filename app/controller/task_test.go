@@ -27,25 +27,25 @@ func newTestTaskRouter(controller *TaskController, token *auth.Token) *gin.Engin
 	return r
 }
 
-func TestTaskController_Get(t *testing.T) {
+func TestTaskController(t *testing.T) {
 	type args struct {
 		r     *http.Request
 		token *auth.Token
 	}
 	type mock struct {
-		argParam model.TaskFetchParam
-		tasks    []model.Task
-		err      error
+		funcName   string
+		args       []any
+		returnArgs []any
 	}
 	type want struct {
 		code int
 		body string
 	}
 	tests := []struct {
-		name string
-		args args
-		mock mock
-		want want
+		name  string
+		args  args
+		mocks []mock
+		want  want
 	}{
 		{
 			name: "リクエストに対して正常なレスポンスを返す",
@@ -55,17 +55,23 @@ func TestTaskController_Get(t *testing.T) {
 					UID: "testuserid1",
 				},
 			},
-			mock: mock{
-				argParam: model.TaskFetchParam{
-					UserID: "testuserid1",
-				},
-				tasks: []model.Task{
-					{
-						ID:          "testtaskid1",
-						UserID:      "testuserid1",
-						Title:       "テストタスク1",
-						Description: "テストタスク説明1",
-						Status:      0,
+			mocks: []mock{
+				{
+					funcName: "Fetch",
+					args: []any{
+						model.TaskFetchParam{UserID: "testuserid1"},
+					},
+					returnArgs: []any{
+						[]model.Task{
+							{
+								ID:          "testtaskid1",
+								UserID:      "testuserid1",
+								Title:       "テストタスク1",
+								Description: "テストタスク説明1",
+								Status:      0,
+							},
+						},
+						nil,
 					},
 				},
 			},
@@ -79,7 +85,9 @@ func TestTaskController_Get(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// ルーターのセットアップ
 			useCase := new(mocks.TaskUseCaseInterface)
-			useCase.On("Fetch", tt.mock.argParam).Return(tt.mock.tasks, tt.mock.err)
+			for _, mock := range tt.mocks {
+				useCase.On(mock.funcName, mock.args...).Return(mock.returnArgs...)
+			}
 			controller := NewTaskController(useCase)
 			router := newTestTaskRouter(controller, tt.args.token)
 
@@ -92,102 +100,6 @@ func TestTaskController_Get(t *testing.T) {
 				t.Errorf("Body File not found: %v", tt.want.body)
 			}
 			assert.Equal(t, string(wantBody), w.Body.String())
-		})
-	}
-}
-
-func TestTaskController_GetByID(t *testing.T) {
-	type fields struct {
-		UseCase TaskUseCaseInterface
-	}
-	type args struct {
-		c *gin.Context
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			controller := &TaskController{
-				UseCase: tt.fields.UseCase,
-			}
-			controller.GetByID(tt.args.c)
-		})
-	}
-}
-
-func TestTaskController_Post(t *testing.T) {
-	type fields struct {
-		UseCase TaskUseCaseInterface
-	}
-	type args struct {
-		c *gin.Context
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			controller := &TaskController{
-				UseCase: tt.fields.UseCase,
-			}
-			controller.Post(tt.args.c)
-		})
-	}
-}
-
-func TestTaskController_Put(t *testing.T) {
-	type fields struct {
-		UseCase TaskUseCaseInterface
-	}
-	type args struct {
-		c *gin.Context
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			controller := &TaskController{
-				UseCase: tt.fields.UseCase,
-			}
-			controller.Put(tt.args.c)
-		})
-	}
-}
-
-func TestTaskController_Delete(t *testing.T) {
-	type fields struct {
-		UseCase TaskUseCaseInterface
-	}
-	type args struct {
-		c *gin.Context
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			controller := &TaskController{
-				UseCase: tt.fields.UseCase,
-			}
-			controller.Delete(tt.args.c)
 		})
 	}
 }
