@@ -53,26 +53,63 @@ func TestTaskController(t *testing.T) {
 		mocks []mock
 		want  want
 	}{
+		/*
+			Get Tests
+		*/
 		{
 			name: "Get: リクエストに対して正常なレスポンスを返す",
 			args: args{
 				method: http.MethodGet,
 				target: "/",
 				token: &auth.Token{
-					UID: "testuserid1",
+					UID: "user_1",
 				},
 			},
 			mocks: []mock{
 				{
 					funcName: "Fetch",
 					args: []any{
-						model.TaskFetchParam{UserID: "testuserid1"},
+						model.TaskFetchParam{UserID: "user_1"},
 					},
 					returnArgs: []any{
 						[]model.Task{
 							{
-								ID:          "testtaskid1",
-								UserID:      "testuserid1",
+								ID:          "task_1",
+								UserID:      "user_1",
+								Title:       "テストタスク1",
+								Description: "テストタスク説明1",
+								Status:      0,
+							},
+						},
+						nil,
+					},
+				},
+			},
+			want: want{
+				code: 200,
+				body: "../../test/testdata/res_tasks.json",
+			},
+		},
+		{
+			name: "Get: リクエストに対して正常なレスポンスを返す（クエリパラメータあり）",
+			args: args{
+				method: http.MethodGet,
+				target: "/?status=0",
+				token: &auth.Token{
+					UID: "user_1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName: "Fetch",
+					args: []any{
+						model.TaskFetchParam{UserID: "user_1", Status: newPoint(0)},
+					},
+					returnArgs: []any{
+						[]model.Task{
+							{
+								ID:          "task_1",
+								UserID:      "user_1",
 								Title:       "テストタスク1",
 								Description: "テストタスク説明1",
 								Status:      0,
@@ -93,19 +130,272 @@ func TestTaskController(t *testing.T) {
 				method: http.MethodGet,
 				target: "/",
 				token: &auth.Token{
-					UID: "testuserid1",
+					UID: "user_1",
 				},
 			},
 			mocks: []mock{
 				{
 					funcName: "Fetch",
 					args: []any{
-						model.TaskFetchParam{UserID: "testuserid1"},
+						model.TaskFetchParam{UserID: "user_1"},
 					},
 					returnArgs: []any{
 						[]model.Task{},
 						errors.New("テストエラーメッセージ"),
 					},
+				},
+			},
+			want: want{
+				code: 500,
+				body: "../../test/testdata/res_error.json",
+			},
+		},
+
+		/*
+			GetByID Tests
+		*/
+		{
+			name: "GetByID: リクエストに対して正常なレスポンスを返す",
+			args: args{
+				method: http.MethodGet,
+				target: "/task_1",
+				token: &auth.Token{
+					UID: "user_1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName: "FetchByID",
+					args:     []any{"task_1", "user_1"},
+					returnArgs: []any{
+						model.Task{
+							ID:          "task_1",
+							UserID:      "user_1",
+							Title:       "テストタスク1",
+							Description: "テストタスク説明1",
+							Status:      0,
+						},
+						nil,
+					},
+				},
+			},
+			want: want{
+				code: 200,
+				body: "../../test/testdata/res_task.json",
+			},
+		},
+		{
+			name: "GetByID: リクエストに対してエラーレスポンスを返す",
+			args: args{
+				method: http.MethodGet,
+				target: "/task_1",
+				token: &auth.Token{
+					UID: "user_1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName: "FetchByID",
+					args:     []any{"task_1", "user_1"},
+					returnArgs: []any{
+						model.Task{},
+						errors.New("テストエラーメッセージ"),
+					},
+				},
+			},
+			want: want{
+				code: 500,
+				body: "../../test/testdata/res_error.json",
+			},
+		},
+
+		/*
+			Post Tests
+		*/
+		{
+			name: "Post: リクエストに対して正常なレスポンスを返す",
+			args: args{
+				method: http.MethodPost,
+				target: "/",
+				body:   "../../test/testdata/req_task.json",
+				token: &auth.Token{
+					UID: "user_1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName: "Create",
+					args: []any{
+						model.Task{
+							UserID:      "user_1",
+							Title:       "テストタスク1",
+							Description: "テストタスク説明1",
+							Status:      0,
+						},
+					},
+					returnArgs: []any{
+						model.Task{
+							ID:          "task_1",
+							UserID:      "user_1",
+							Title:       "テストタスク1",
+							Description: "テストタスク説明1",
+							Status:      0,
+						},
+						nil,
+					},
+				},
+			},
+			want: want{
+				code: 201,
+				body: "../../test/testdata/res_task.json",
+			},
+		},
+		{
+			name: "Post: リクエストに対してエラーレスポンスを返す",
+			args: args{
+				method: http.MethodPost,
+				target: "/",
+				body:   "../../test/testdata/req_task.json",
+				token: &auth.Token{
+					UID: "user_1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName: "Create",
+					args: []any{
+						model.Task{
+							UserID:      "user_1",
+							Title:       "テストタスク1",
+							Description: "テストタスク説明1",
+							Status:      0,
+						},
+					},
+					returnArgs: []any{
+						model.Task{},
+						errors.New("テストエラーメッセージ"),
+					},
+				},
+			},
+			want: want{
+				code: 500,
+				body: "../../test/testdata/res_error.json",
+			},
+		},
+
+		/*
+			Put Tests
+		*/
+		{
+			name: "Put: リクエストに対して正常なレスポンスを返す",
+			args: args{
+				method: http.MethodPut,
+				target: "/task_1",
+				body:   "../../test/testdata/req_task.json",
+				token: &auth.Token{
+					UID: "user_1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName: "Update",
+					args: []any{
+						model.Task{
+							ID:          "task_1",
+							UserID:      "user_1",
+							Title:       "テストタスク1",
+							Description: "テストタスク説明1",
+							Status:      0,
+						},
+					},
+					returnArgs: []any{
+						model.Task{
+							ID:          "task_1",
+							UserID:      "user_1",
+							Title:       "テストタスク1",
+							Description: "テストタスク説明1",
+							Status:      0,
+						},
+						nil,
+					},
+				},
+			},
+			want: want{
+				code: 200,
+				body: "../../test/testdata/res_task.json",
+			},
+		},
+		{
+			name: "Put: リクエストに対してエラーレスポンスを返す",
+			args: args{
+				method: http.MethodPut,
+				target: "/task_1",
+				body:   "../../test/testdata/req_task.json",
+				token: &auth.Token{
+					UID: "user_1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName: "Update",
+					args: []any{
+						model.Task{
+							ID:          "task_1",
+							UserID:      "user_1",
+							Title:       "テストタスク1",
+							Description: "テストタスク説明1",
+							Status:      0,
+						},
+					},
+					returnArgs: []any{
+						model.Task{},
+						errors.New("テストエラーメッセージ"),
+					},
+				},
+			},
+			want: want{
+				code: 500,
+				body: "../../test/testdata/res_error.json",
+			},
+		},
+
+		/*
+			Delete Tests
+		*/
+		{
+			name: "Delete: リクエストに対して正常なレスポンスを返す",
+			args: args{
+				method: http.MethodDelete,
+				target: "/task_1",
+				token: &auth.Token{
+					UID: "user_1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName:   "Delete",
+					args:       []any{"task_1", "user_1"},
+					returnArgs: []any{nil},
+				},
+			},
+			want: want{
+				code: 204,
+			},
+		},
+		{
+			name: "Delete: リクエストに対してエラーレスポンスを返す",
+			args: args{
+				method: http.MethodDelete,
+				target: "/task_1",
+				token: &auth.Token{
+					UID: "user_1",
+				},
+			},
+			mocks: []mock{
+				{
+					funcName:   "Delete",
+					args:       []any{"task_1", "user_1"},
+					returnArgs: []any{errors.New("テストエラーメッセージ")},
 				},
 			},
 			want: want{
@@ -141,12 +431,18 @@ func TestTaskController(t *testing.T) {
 
 			// テスト実行
 			assert.Equal(t, tt.want.code, w.Code)
-			wantBody, err := ioutil.ReadFile(tt.want.body)
-			if err != nil {
-				t.Errorf("Response Body File not found: %v", tt.want.body)
+			if body := tt.want.body; body != "" {
+				wantBody, err := ioutil.ReadFile(tt.want.body)
+				if err != nil {
+					t.Errorf("Response Body File not found: %v", tt.want.body)
+				}
+				assert.Equal(t, string(wantBody), w.Body.String())
 			}
-			assert.Equal(t, string(wantBody), w.Body.String())
 			mockUseCase.AssertExpectations(t)
 		})
 	}
+}
+
+func newPoint[V any](v V) *V {
+	return &v
 }
