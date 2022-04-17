@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/kzuabe/ginauth v1.0.1
 	github.com/stretchr/testify v1.7.1
-	github.com/swaggo/gin-swagger v1.4.1
+	github.com/swaggo/gin-swagger v1.4.2
 	github.com/swaggo/swag v1.8.1
 	gorm.io/driver/mysql v1.3.2
 	gorm.io/driver/sqlite v1.3.1
