@@ -1,169 +1,192 @@
 package usecase
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/kzuabe/todolist-go-api/app/model"
+	mocks "github.com/kzuabe/todolist-go-api/test/mocks/app/usecase"
+	"github.com/stretchr/testify/assert"
 )
 
+type mock struct {
+	funcName   string
+	args       []any
+	returnArgs []any
+}
+
 func TestTaskUseCase_Fetch(t *testing.T) {
-	type fields struct {
-		Repository TaskRepositoryInterface
-	}
 	type args struct {
 		params model.TaskFetchParam
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    []model.Task
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "UserIDの値が空文字だった場合にエラーを返す",
+			args: args{
+				params: model.TaskFetchParam{UserID: ""},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			useCase := &TaskUseCase{
-				Repository: tt.fields.Repository,
-			}
+			mockRepository := new(mocks.TaskRepositoryInterface)
+			useCase := NewTaskUseCase(mockRepository)
+
 			got, err := useCase.Fetch(tt.args.params)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("TaskUseCase.Fetch() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				assert.Error(t, err)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TaskUseCase.Fetch() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, got)
+			assert.Nil(t, err)
 		})
 	}
 }
 
 func TestTaskUseCase_FetchByID(t *testing.T) {
-	type fields struct {
-		Repository TaskRepositoryInterface
-	}
 	type args struct {
 		id     string
 		userID string
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
+		mocks   []mock
 		want    model.Task
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "取得したタスクのUserIDが入力と一致しなかった場合にエラーを返す",
+			args: args{
+				id:     "task_id1",
+				userID: "user_id2",
+			},
+			mocks: []mock{
+				{
+					funcName: "FetchByID",
+					args:     []any{"task_id1"},
+					returnArgs: []any{
+						model.Task{ID: "task_id1", UserID: "user_id1"},
+						nil,
+					},
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			useCae := &TaskUseCase{
-				Repository: tt.fields.Repository,
+			mockRepository := new(mocks.TaskRepositoryInterface)
+			for _, mock := range tt.mocks {
+				mockRepository.On(mock.funcName, mock.args...).Return(mock.returnArgs...)
 			}
-			got, err := useCae.FetchByID(tt.args.id, tt.args.userID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("TaskUseCase.FetchByID() error = %v, wantErr %v", err, tt.wantErr)
+			useCase := NewTaskUseCase(mockRepository)
+			got, err := useCase.FetchByID(tt.args.id, tt.args.userID)
+			if tt.wantErr {
+				assert.Error(t, err)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TaskUseCase.FetchByID() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestTaskUseCase_Create(t *testing.T) {
-	type fields struct {
-		Repository TaskRepositoryInterface
-	}
-	type args struct {
-		task model.Task
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    model.Task
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			useCase := &TaskUseCase{
-				Repository: tt.fields.Repository,
-			}
-			got, err := useCase.Create(tt.args.task)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("TaskUseCase.Create() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TaskUseCase.Create() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, got)
+			assert.Nil(t, err)
 		})
 	}
 }
 
 func TestTaskUseCase_Update(t *testing.T) {
-	type fields struct {
-		Repository TaskRepositoryInterface
-	}
 	type args struct {
 		task model.Task
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
+		mocks   []mock
 		want    model.Task
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "更新したいタスクのUserIDが入力と一致しなかった場合にエラーを返す",
+			args: args{
+				task: model.Task{ID: "task_id1", UserID: "user_id2"},
+			},
+			mocks: []mock{
+				{
+					funcName: "FetchByID",
+					args:     []any{"task_id1"},
+					returnArgs: []any{
+						model.Task{ID: "task_id1", UserID: "user_id1"},
+						nil,
+					},
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			useCase := &TaskUseCase{
-				Repository: tt.fields.Repository,
+			mockRepository := new(mocks.TaskRepositoryInterface)
+			for _, mock := range tt.mocks {
+				mockRepository.On(mock.funcName, mock.args...).Return(mock.returnArgs...)
 			}
+			useCase := NewTaskUseCase(mockRepository)
 			got, err := useCase.Update(tt.args.task)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("TaskUseCase.Update() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				assert.Error(t, err)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TaskUseCase.Update() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, got)
+			assert.Nil(t, err)
 		})
 	}
 }
 
 func TestTaskUseCase_Delete(t *testing.T) {
-	type fields struct {
-		Repository TaskRepositoryInterface
-	}
 	type args struct {
 		id     string
 		userID string
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
+		mocks   []mock
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "削除したいタスクのUserIDが入力と一致しなかった場合にエラーを返す",
+			args: args{
+				id:     "task_id1",
+				userID: "user_id2",
+			},
+			mocks: []mock{
+				{
+					funcName: "FetchByID",
+					args:     []any{"task_id1"},
+					returnArgs: []any{
+						model.Task{ID: "task_id1", UserID: "user_id1"},
+						nil,
+					},
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			useCase := &TaskUseCase{
-				Repository: tt.fields.Repository,
+			mockRepository := new(mocks.TaskRepositoryInterface)
+			for _, mock := range tt.mocks {
+				mockRepository.On(mock.funcName, mock.args...).Return(mock.returnArgs...)
 			}
-			if err := useCase.Delete(tt.args.id, tt.args.userID); (err != nil) != tt.wantErr {
-				t.Errorf("TaskUseCase.Delete() error = %v, wantErr %v", err, tt.wantErr)
+			useCase := NewTaskUseCase(mockRepository)
+			err := useCase.Delete(tt.args.id, tt.args.userID)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
 			}
+			assert.Nil(t, err)
 		})
 	}
 }
@@ -178,13 +201,31 @@ func Test_verifyUser(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "UserIDの値が一致する場合はエラーを返さない",
+			args: args{
+				task:   model.Task{UserID: "user_id1"},
+				userID: "user_id1",
+			},
+			wantErr: false,
+		},
+		{
+			name: "UserIDの値が一致しない場合はエラーを返す",
+			args: args{
+				task:   model.Task{UserID: "user_id1"},
+				userID: "user_id2",
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := verifyUser(tt.args.task, tt.args.userID); (err != nil) != tt.wantErr {
-				t.Errorf("verifyUser() error = %v, wantErr %v", err, tt.wantErr)
+			err := verifyUser(tt.args.task, tt.args.userID)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
 			}
+			assert.Nil(t, err)
 		})
 	}
 }
