@@ -31,8 +31,8 @@ func (useCase *TaskUseCase) Fetch(params model.TaskFetchParam) ([]model.Task, er
 	return useCase.Repository.Fetch(params)
 }
 
-func (useCae *TaskUseCase) FetchByID(id string, userID string) (model.Task, error) {
-	task, err := useCae.Repository.FetchByID(id)
+func (useCase *TaskUseCase) FetchByID(id string, userID string) (model.Task, error) {
+	task, err := useCase.Repository.FetchByID(id)
 	if err != nil {
 		return model.Task{}, err
 	}

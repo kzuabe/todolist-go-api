@@ -10,9 +10,9 @@ build:
 test:
 	go test ./...
 
-.PHONY: wire
-wire:
-	wire ./cmd/todolist
+.PHONY: mock
+mock:
+	mockery --all --keeptree --output=test/mocks
 
 .PHONY: swag
 swag:

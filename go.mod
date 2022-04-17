@@ -3,13 +3,15 @@ module github.com/kzuabe/todolist-go-api
 go 1.18
 
 require (
+	firebase.google.com/go v3.13.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
 	github.com/google/uuid v1.3.0
-	github.com/google/wire v0.5.0
-	github.com/kzuabe/ginauth v1.0.0
+	github.com/kzuabe/ginauth v1.0.1
+	github.com/stretchr/testify v1.7.1
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.8.0
 	gorm.io/driver/mysql v1.3.2
+	gorm.io/driver/sqlite v1.3.1
 	gorm.io/gorm v1.23.3
 )
 
@@ -19,10 +21,10 @@ require (
 	cloud.google.com/go/firestore v1.6.1 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
 	cloud.google.com/go/storage v1.18.2 // indirect
-	firebase.google.com/go v3.13.0+incompatible // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
@@ -43,8 +45,11 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/mattn/go-sqlite3 v1.14.9 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/objx v0.1.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29 // indirect
@@ -60,4 +65,5 @@ require (
 	google.golang.org/grpc v1.45.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
