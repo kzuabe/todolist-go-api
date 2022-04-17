@@ -31,7 +31,7 @@ func (repository *TaskRepository) Fetch(params model.TaskFetchParam) ([]model.Ta
 	result := tx.Find(&dbTasks)
 
 	if err := result.Error; err != nil {
-		return []model.Task{}, err
+		return []model.Task{}, wrapError(err)
 	}
 
 	tasks := make([]model.Task, len(dbTasks))
@@ -47,10 +47,7 @@ func (repository *TaskRepository) FetchByID(id string) (model.Task, error) {
 	result := repository.DB.First(&dbTask, "uuid = ?", id)
 
 	if err := result.Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			err = &model.Error{StatusCode: http.StatusNotFound, Message: "データが存在しません"}
-		}
-		return model.Task{}, err
+		return model.Task{}, wrapError(err)
 	}
 
 	fetched := dbTask.toModel()
@@ -65,7 +62,7 @@ func (repository *TaskRepository) Create(task model.Task) (model.Task, error) {
 	result := repository.DB.Create(&dbTask)
 
 	if err := result.Error; err != nil {
-		return model.Task{}, err
+		return model.Task{}, wrapError(err)
 	}
 
 	created := dbTask.toModel()
@@ -73,30 +70,35 @@ func (repository *TaskRepository) Create(task model.Task) (model.Task, error) {
 }
 
 func (repository *TaskRepository) Update(task model.Task) (model.Task, error) {
-	dbTask := toDBTask(task)
+	dbTask := Task{}
 
-	tx := repository.DB.Model(&Task{}).Where("uuid = ?", dbTask.UUID)               // UUIDが一致するデータを対象とする
-	result := tx.Select("UserID", "Title", "Description", "Status").Updates(dbTask) // WARNING: カラム追加時はここにフィールド名の追加が必要
-
+	result := repository.DB.First(&dbTask, "uuid = ?", task.ID)
 	if err := result.Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			err = &model.Error{StatusCode: http.StatusNotFound, Message: "データが存在しません"}
-		}
-		return model.Task{}, err
+		return model.Task{}, wrapError(err)
 	}
 
-	// NOTE: 更新処理の都合上フィールドの更新が行われないので引数と同じ値を返す
+	dbTask.updateFromModel(task) // 更新
+
+	result = repository.DB.Save(&dbTask)
+	if err := result.Error; err != nil {
+		return model.Task{}, wrapError(err)
+	}
+
 	updated := dbTask.toModel()
 	return updated, nil
 }
 
 func (repository *TaskRepository) Delete(id string) error {
-	result := repository.DB.Delete(&Task{}, "uuid = ?", id)
+	dbTask := Task{}
+
+	result := repository.DB.First(&dbTask, "uuid = ?", id)
 	if err := result.Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			err = &model.Error{StatusCode: http.StatusNotFound, Message: "データが存在しません"}
-		}
-		return err
+		return wrapError(err)
+	}
+
+	result = repository.DB.Delete(&dbTask)
+	if err := result.Error; err != nil {
+		return wrapError(err)
 	}
 	return nil
 }
@@ -130,4 +132,22 @@ func toDBTask(task model.Task) Task {
 		Status:      task.Status,
 	}
 	return t
+}
+
+// WARNING: カラム追加時はここに更新するフィールドの処理が必要
+func (task *Task) updateFromModel(t model.Task) {
+	task.UserID = t.UserID
+	task.Title = t.Title
+	task.Description = t.Description
+	task.Status = t.Status
+}
+
+func wrapError(err error) error {
+	var wrapped error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		wrapped = &model.Error{StatusCode: http.StatusNotFound, Message: "データが存在しません"}
+		return wrapped
+	}
+	wrapped = &model.Error{StatusCode: http.StatusInternalServerError, Message: err.Error()}
+	return wrapped
 }
