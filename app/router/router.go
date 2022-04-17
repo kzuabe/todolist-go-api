@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/kzuabe/ginauth"
 	"github.com/kzuabe/todolist-go-api/app/controller"
@@ -13,6 +14,7 @@ func NewRouter(tc *controller.TaskController) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(controller.ErrorHandler())
+	router.Use(cors.Default())
 
 	v1 := router.Group("/v1")
 
