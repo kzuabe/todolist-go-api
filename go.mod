@@ -9,7 +9,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/kzuabe/ginauth v1.0.1
 	github.com/stretchr/testify v1.7.1
-	github.com/swaggo/gin-swagger v1.4.2
+	github.com/swaggo/gin-swagger v1.4.3
 	github.com/swaggo/swag v1.8.1
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/driver/sqlite v1.3.1
@@ -54,7 +54,7 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29 // indirect
-	golang.org/x/net v0.0.0-20220325170049-de3da57026de // indirect
+	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a // indirect
 	golang.org/x/sys v0.0.0-20220330033206-e17cdc41300f // indirect
 	golang.org/x/text v0.3.7 // indirect
