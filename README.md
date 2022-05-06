@@ -17,7 +17,7 @@ Todoリストアプリ API Go実装
 ```bash
 $ go mod download
 
-$ export API_ENV=<develop|production> DSN="<user>:<password>:3306)/<dbname>" GOOGLE_APPLICATION_CREDENTIALS="<Path to service-account-file.json>"
+$ export API_ENV=<develop|production> DSN="<user>:<password>@tcp(<host>:3306)/<dbname>" GOOGLE_APPLICATION_CREDENTIALS="<Path to service-account-file.json>"
 
 $ make run
 ```
