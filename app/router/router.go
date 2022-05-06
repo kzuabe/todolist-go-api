@@ -14,7 +14,7 @@ func NewRouter(tc *controller.TaskController) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(controller.ErrorHandler())
-	router.Use(cors.Default())
+	router.Use(cors.New(corsConfig()))
 
 	v1 := router.Group("/v1")
 
@@ -31,4 +31,11 @@ func NewRouter(tc *controller.TaskController) *gin.Engine {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
+}
+
+func corsConfig() cors.Config {
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = append(config.AllowHeaders, "Authorization")
+	return config
 }
